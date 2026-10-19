@@ -8,11 +8,14 @@ exactly `propext`, `Classical.choice`, and `Quot.sound`.
 
 ## Source and statement correspondence
 
-The source of record is [`paper/main.tex`](paper/main.tex), SHA-256:
+The source of record is the author's separately held TeX manuscript, SHA-256:
 
 ```text
 4290745fdf5234d3f1ccc6ed24cfdc48efde043241939b726713485b700099af
 ```
+
+The manuscript is not distributed in the current repository. Its numbered
+headline results are Theorems 1.1–1.3 and Corollary 1.4.
 
 The public entry point is [`Pell/MainResults.lean`](Pell/MainResults.lean).
 Its declarations have explicit source-shaped types, with no supplied
@@ -57,6 +60,15 @@ files. Its SHA-256 is:
 ```text
 d41eb07e74dcfb6bdfb5f322ed344ef488d30409888ec624679358e6f2baf062
 ```
+
+This is the historical build manifest preserved in `evidence/verification/`.
+After that run, the TeX source was removed from distribution, theorem numbers
+were added to the README, and the checker and packager were adjusted to use
+private-manuscript metadata without requiring a local TeX file. The current
+repository-root manifest covers 874 files. All 851 Lean sources and dependency
+pins remain byte-for-byte identical to the recorded build. The updated
+verification guardrails and source-integrity checks were rerun successfully;
+the historical compiler receipts have not been rewritten.
 
 ## Evidence and reproduction
 

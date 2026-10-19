@@ -2,16 +2,17 @@
 
 This standalone project proves the three main theorems and both conclusions
 of the Pell-unit corollary in **On the average of class numbers of indefinite
-binary quadratic forms**, by Yijie Diao. The manuscript is
-[`paper/main.tex`](paper/main.tex).
+binary quadratic forms**, by Yijie Diao. The numbers below follow the
+author's TeX manuscript, which is kept separately and is not distributed in
+this repository.
 
-| Source result | Lean declaration in [`Pell/MainResults.lean`](Pell/MainResults.lean) |
+| Manuscript result | Lean declaration in [`Pell/MainResults.lean`](Pell/MainResults.lean) |
 | --- | --- |
-| `T:field-class-average` | `PellPaper.field_class_average` |
-| `T:odd-class-average` | `PellPaper.odd_class_average` |
-| `T:uniform-exceptional` | `PellPaper.uniform_exceptional` |
-| `C:pell-unit-growth`, logarithmic bound | `PellPaper.pell_unit_growth_density` |
-| `C:pell-unit-growth`, every fixed power | `PellPaper.fixed_power_density` |
+| **Theorem 1.1** — Class-number averages | `PellPaper.field_class_average` |
+| **Theorem 1.2** — Average number of odd-order ideal classes | `PellPaper.odd_class_average` |
+| **Theorem 1.3** — Uniform exceptional-set bound for small Pell solutions | `PellPaper.uniform_exceptional` |
+| **Corollary 1.4** — Logarithmic growth of the fundamental Pell solution | `PellPaper.pell_unit_growth_density` |
+| **Corollary 1.4** — Growth beyond every fixed power | `PellPaper.fixed_power_density` |
 
 The field/form average is bounded by
 `C X^(3/2) sqrt(log log X)/(log X)^(3/2)` for every real `X ≥ 3`.
@@ -90,9 +91,10 @@ account authorized by the owner; private GitHub repositories do not offer a
 shared passcode for anonymous visitors. Repository access should remain private
 until the owner chooses otherwise.
 
-This directory is the repository root. It contains sources, manuscript,
+This directory is the repository root. It contains Lean sources,
 pinned configuration, result map, provenance, verification tools, evidence and
-CI. Original-code and manuscript licensing remains for the owner to choose;
+CI. The TeX manuscript is excluded from Git and source bundles.
+Original-code licensing remains for the owner to choose;
 upstream license notices are preserved.
 
 Create the reproducible source-only bundle locally with:
