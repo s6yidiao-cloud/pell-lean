@@ -1,0 +1,15 @@
+# Preserve the checked LF source bytes on every checkout.
+*.lean text eol=lf
+*.tex text eol=lf
+*.md text eol=lf
+*.toml text eol=lf
+*.json text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.py text eol=lf
+lean-toolchain text eol=lf
+SOURCE_SHA256SUMS text eol=lf
+*LICENSE text eol=lf
+*.cff text eol=lf
+.gitignore text eol=lf
+.gitattributes text eol=lf
