@@ -134,11 +134,16 @@ are recorded in `VERIFICATION.md`, `evidence/verification/`, and the
 machine-readable status sidecar.
 
 The current source graph contains 857 authored modules and is acyclic.
-All 67 affected modules and the expanded central audit have passed direct
-Lean checks with warnings as errors. The primary-route statements and dependency changes
-have received independent AI semantic review. A fresh build of all 857
-authored modules and the expanded central audit is pending; the existing
-full-build receipts remain historical evidence for their recorded snapshots.
+The [fresh GitHub Actions build](https://github.com/s6yidiao-cloud/pell-lean/actions/runs/39291683619)
+passed for commit `52ace63b6294009c1a7633d7466302a1efc3e4be`: all 857 modules,
+nine literal types, 27 axiom reports and seventeen mandatory endpoints.
+The [`summary.json`](evidence/verification/manuscript-primary-ci/summary.json)
+records the 2233.681-second verifier run. All current Lean sources match the
+compiled snapshot; subsequent changes are documentation and receipt followups
+only, with proofs and verifier unchanged. The primary-route statements and
+dependencies also passed [independent AI review](evidence/verification/PRIMARY_MANUSCRIPT_REVIEW.md).
+Earlier full-build receipts remain historical evidence for their recorded
+snapshots.
 
 ## Manuscript intermediate arguments in the primary route
 

@@ -7,13 +7,25 @@ see [README.md](README.md) for the precise difference from the manuscript.
 
 ## Current checks
 
-The project contains 857 local Lean modules: 773 Pell modules, 82 vendored
-TauCeti modules, the importing root, and the central audit. All 67 modules affected by the proof changes passed strict compilation,
-including the public entry point and central audit. All nine literal type
-checks and 27 axiom reports passed; every report contains exactly the three
-permitted standard axioms.
-A fresh full build of this revision is pending; its result will be recorded
-separately from the earlier successful builds below.
+The fresh full build passed in [GitHub Actions run #9](https://github.com/s6yidiao-cloud/pell-lean/actions/runs/39291683619)
+for source commit `52ace63b6294009c1a7633d7466302a1efc3e4be`. It rebuilt all
+857 local Lean modules: 773 Pell modules, 82 vendored TauCeti modules, the
+importing root, and the central audit. All nine literal type checks and
+27 axiom reports passed, including all seventeen mandatory endpoints; every
+report contains exactly the three permitted standard axioms. The verifier
+completed in 2233.681 seconds on Linux with Lean 4.33.1, one build job and
+two Lean threads; the workflow took 40 minutes 29 seconds. The full receipt
+is [`summary.json`](evidence/verification/manuscript-primary-ci/summary.json),
+with commands and compiler details in
+[`COMPILER.md`](evidence/verification/manuscript-primary-ci/COMPILER.md).
+
+All 857 current Lean source hashes match that compiled snapshot. Subsequent
+changes contain documentation and receipt followups only; the proofs and
+verifier are unchanged. The frozen CI input manifest has SHA-256
+`af22bfef63093774593ec7f16291452f6088bc641d22e79d7fbc2099fc94f467`
+and is retained in
+[`manuscript-primary-ci/SOURCE_SHA256SUMS`](evidence/verification/manuscript-primary-ci/SOURCE_SHA256SUMS).
+The earlier focused strict compilation of all 67 affected modules also passed.
 
 [`PellAudit.lean`](PellAudit.lean) checks nine literal theorem types and
 27 transitive-axiom reports. Seventeen reports are mandatory endpoints of
