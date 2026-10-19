@@ -1,0 +1,76 @@
+schema_version: 1
+project: "On the average of class numbers of indefinite binary quadratic forms"
+source:
+  path: paper/main.tex
+  sha256: 4290745fdf5234d3f1ccc6ed24cfdc48efde043241939b726713485b700099af
+  relationship: exact manuscript snapshot under an unversioned publication filename
+entry_point: Pell/MainResults.lean
+toolchain:
+  lean: leanprover/lean4:v4.33.1
+  mathlib_tag: v4.33.1
+  mathlib_commit: 0df444a360eaa60ab8c11dca51a86af692955474
+  lockfile: lake-manifest.json
+  vendor: vendor/TauCeti
+results:
+  - source_label: "T:field-class-average"
+    declaration: PellPaper.field_class_average
+    file: Pell/MainResults.lean
+    status: proved
+    additional_finiteness: PellPaper.proper_form_classes_finite
+    implementation: PellPaper.final_field_class_average
+    proof_variation: conductor class-number comparison instead of all-order L-value moment
+  - source_label: "T:odd-class-average"
+    declaration: PellPaper.odd_class_average
+    file: Pell/MainResults.lean
+    status: proved
+    semantic_bridge: PellPaper.realQuadraticFieldOddClassNumber_eq_card_oddOrderClasses
+    implementation: PellPaper.final_odd_class_average
+  - source_label: "T:uniform-exceptional"
+    declaration: PellPaper.uniform_exceptional
+    file: Pell/MainResults.lean
+    status: proved
+    implementation: PellPaper.final_uniform_exceptional
+    proof_variation: budgeted square-part restoration instead of manuscript's doubled parameter
+  - source_label: "C:pell-unit-growth"
+    declarations:
+      - PellPaper.pell_unit_growth_density
+      - PellPaper.fixed_power_density
+    file: Pell/MainResults.lean
+    status: proved
+trust:
+  foundation: pinned Mathlib and fully included proved Lean sources
+  allowed_axioms:
+    - propext
+    - Classical.choice
+    - Quot.sound
+  authored_axioms: 0
+  placeholders: 0
+  external_mathematical_inputs: []
+  external_numerical_certificates: []
+  audit_file: PellAudit.lean
+checker:
+  script: scripts/verify.py
+  warnings_as_errors: true
+  fresh_project_and_vendor_outputs: true
+  source_manifest: SOURCE_SHA256SUMS
+  literal_endpoint_type_checks: PellAudit.lean
+  required_literal_type_checks: 6
+  required_axiom_reports: 12
+  independent_kernel_replay: not performed
+  external_dependency_caches: reused; pinned clean source trees checked
+  forbidden_tokens: [axiom, sorry, admit, sorryAx, native_decide, trustCompiler]
+  evidence_record: VERIFICATION.md
+  evidence_directory: evidence/verification
+review:
+  tier: critical
+  paper_to_lean: independent-ai-reviewed
+  semantic_reviewer: separate semantic review agent
+  dependency_reviewer: separate trust review agent
+  independent_human_certification: false
+  source_scope: headline results; alternative intermediate proof routes documented
+  map: FORMALIZATION_MAP.md
+repository:
+  intended_url: https://github.com/s6yidiao-cloud/pell-lean
+  visibility: private
+  access: GitHub account authentication and owner-authorized repository access
+  anonymous_passcode_access: false
