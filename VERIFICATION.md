@@ -3,7 +3,8 @@
 The current proofs use the manuscript's `2θ` restoration and parameterized
 square sieve in the main results. The class-number proof still uses a
 fundamental-discriminant second moment followed by a conductor comparison;
-see [README.md](README.md) for the precise difference from the manuscript.
+see [FORMALIZATION_MAP.md](FORMALIZATION_MAP.md) for the precise difference
+from the manuscript.
 
 ## Current checks
 
