@@ -1,0 +1,17 @@
+.lake/
+build/
+.DS_Store
+._*
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.pdf
+*.toc
+*.olean
+*.ilean
+*.c
+*.o
+__pycache__/
+*.pyc
