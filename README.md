@@ -39,10 +39,10 @@ and explains the intermediate arguments.
 
 For the class-number average, Lean proves the second-moment estimate
 
-$$
-\sum_{\substack{1<D<X\\D\text{ fundamental}}} L(1,\chi_D)^2 \ll X,
+```math
+\sum_{1 < D < X, D\text{ fundamental}} L(1,\chi_D)^2 \ll X,
 \qquad \chi_D(n)=\left(\frac{D}{n}\right).
-$$
+```
 
 Here the Kronecker symbol defines the quadratic Dirichlet character
 $\chi_D$, and $L(1,\chi_D)^2$ means the square of its Dirichlet
