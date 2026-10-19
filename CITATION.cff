@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: "Please cite the manuscript and specify the checked source revision when using this formalization."
+type: software
+title: "Pell: Lean formalization of On the average of class numbers of indefinite binary quadratic forms"
+authors:
+  - family-names: Diao
+    given-names: Yijie
+abstract: "Lean proofs of the three main theorems and Pell-unit growth corollary of the included manuscript paper/main.tex. See formalization.yaml and VERIFICATION.md for scope and evidence."
+keywords:
+  - Lean
+  - Pell equations
+  - quadratic forms
+  - class numbers
