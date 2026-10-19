@@ -232,6 +232,14 @@ def required_control_files() -> set[Path]:
     return files
 
 
+def check_manuscript_metadata(status: str) -> None:
+    """Keep statement provenance without requiring distribution of private TeX."""
+    require(re.search(r"(?m)^  bundled: false\s*$", status) is not None,
+            "Manuscript source must remain private (bundled: false)")
+    require(re.search(r"(?m)^  sha256: [\"']?[0-9a-f]{64}[\"']?\s*$", status) is not None,
+            "Missing or malformed private manuscript fingerprint")
+
+
 def check_integrity(modules: dict[str, tuple[Path, Path]]) -> dict[str, str]:
     require((ROOT / "lean-toolchain").read_text().strip() == TOOLCHAIN,
             "Unexpected Lean toolchain pin")
@@ -243,15 +251,10 @@ def check_integrity(modules: dict[str, tuple[Path, Path]]) -> dict[str, str]:
     required = source_files | required_control_files() | {ROOT / p for p in ["lean-toolchain", "lakefile.toml",
         "lake-manifest.json", "formalization.yaml"]}
     status = (ROOT / "formalization.yaml").read_text()
-    match = re.search(r"(?m)^  path: [\"']?([^\"'\n]+)[\"']?\s*$", status)
-    hash_match = re.search(r"(?m)^  sha256: [\"']?([0-9a-f]{64})", status)
-    require(match is not None and hash_match is not None, "Missing manuscript path/hash in status")
-    manuscript = ROOT / match.group(1).strip()
-    require(manuscript.resolve().is_relative_to(ROOT) and manuscript.is_file(),
-            "Unsafe or missing manuscript source")
-    require(digest(manuscript) == hash_match.group(1), "Manuscript/status hash mismatch")
-    required.add(manuscript)
+    check_manuscript_metadata(status)
     hashes = check_hash_manifest(ROOT / "SOURCE_SHA256SUMS", ROOT, required)
+    require(not any(Path(name).suffix.lower() == ".tex" for name in hashes),
+            "Source manifest must not distribute private TeX manuscript files")
     vendor = ROOT / "vendor/TauCeti"
     check_hash_manifest(vendor / "SOURCE_SHA256SUMS", vendor,
                         {p for p in source_files if p.is_relative_to(vendor)})

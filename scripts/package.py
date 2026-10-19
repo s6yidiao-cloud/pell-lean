@@ -19,7 +19,7 @@ def main():
     verify.check_integrity(verify.authored_modules())
     excluded = {'.git', '.lake', 'build', '__pycache__', '.pytest_cache'}
     special = {'LICENSE', 'NOTICE', 'lean-toolchain', 'SOURCE_SHA256SUMS', '.gitignore', '.gitattributes'}
-    extensions = {'.lean', '.tex', '.md', '.toml', '.json', '.yaml', '.yml', '.py', '.sh', '.svg', '.png', '.cff'}
+    extensions = {'.lean', '.md', '.toml', '.json', '.yaml', '.yml', '.py', '.sh', '.svg', '.png', '.cff'}
     files = []
     for directory, folders, filenames in os.walk(verify.ROOT):
         folders[:] = [name for name in folders if name not in excluded and not name.startswith('._')]

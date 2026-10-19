@@ -12,6 +12,17 @@ import verify
 
 
 class VerificationBoundaryTests(unittest.TestCase):
+    def test_private_manuscript_provenance_needs_no_tex_file(self):
+        status = 'source:\n  bundled: false\n  sha256: ' + 'a' * 64 + '\n'
+        verify.check_manuscript_metadata(status)
+        for invalid in [status.replace('false', 'true'),
+                        status.replace('a' * 64, 'a' * 63),
+                        'source:\n  bundled: false\n',
+                        'source:\n  sha256: ' + 'a' * 64 + '\n']:
+            with self.subTest(status=invalid):
+                with self.assertRaises(RuntimeError):
+                    verify.check_manuscript_metadata(invalid)
+
     def test_parallel_scheduler_observes_dependencies_and_order(self):
         dependencies = {'A': set(), 'B': {'A'}, 'C': {'A'}, 'D': {'B', 'C'}, 'E': set()}
         done, lock = set(), threading.Lock()
