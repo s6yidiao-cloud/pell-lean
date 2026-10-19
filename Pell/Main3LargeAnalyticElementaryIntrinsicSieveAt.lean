@@ -25,14 +25,9 @@ def FullCellElementaryOddHomogeneousPolynomialSieveAt (sieveN : ℕ) : Prop :=
     ((integerSymmetricInterval A).card : ℝ) ≤ 12 / mu →
     ((integerSymmetricInterval B).card : ℝ) ≤ 12 * mu / delta →
     A ≤ 4 * (U + V) → B ≤ 4 * (U + V) →
-    let HJ : ℕ := 2 ^ d * (d + 1) * HK
     let Wval : ℝ :=
       ((d : ℝ) + 1) * (HK : ℝ) * (4 * (U + V)) ^ d
     Real.log Wval ≤ (Real.log 2 / 16) * (sieveN : ℝ) →
-    (∀ j : ℕ, Odd j → 0 < j → j ≤ d →
-      fullCellCertificateLogMajorant d HK j +
-          2 * Real.log (HJ : ℝ) ≤
-        (Real.log 2 / 8) * (sieveN : ℝ)) →
     (((T.filter fun y =>
       IsSquare (MvPolynomial.eval y K) ∧
         MvPolynomial.eval y K ≠ 0).card : ℝ)) ≤
@@ -162,7 +157,7 @@ theorem FullCellElementaryOddHomogeneousPolynomialSieveAt.card_main3LargeAnalyti
   unfold FullCellElementaryOddHomogeneousPolynomialSieveAt at hsieve
   exact hsieve U V M₀ mu delta A Brect W T P d HK
     hU hV hM₀pos hmu hdelta hmuSq hhom hodd hHK hcoeff
-    hsubset harea hsideA hsideB hA hB hbudgets.1 hbudgets.2
+    hsubset harea hsideA hsideB hA hB hbudgets.1
 
 theorem FullCellElementaryOddHomogeneousPolynomialSieveAt.card_main3LargeAnalytic_blockAuxiliaryArchimedeanCellPointFiber_cast_le_commonFactor_add_twice_fullCellEnvelope_of_entryBoundSpec
     {sieveN : ℕ}
@@ -234,4 +229,3 @@ end
 
 end PellPaper
 
-#print axioms PellPaper.eventually_fullCellElementaryOddHomogeneousPolynomialSieveAt

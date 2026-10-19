@@ -1,15 +1,14 @@
-import Pell.ElementaryQuadraticCharacterSieveBypass
-import Pell.IntrinsicOddHomogeneousPolynomialSquareSieve
+import Pell.AnisotropicSharpSquareSieve
+import Pell.DyadicResidualFullCellSquareSieve
 import Pell.FullCellElementarySieveEnvelope
 import Mathlib.Tactic
 
 /-!
-# Elementary intrinsic square sieve for the Main3 large branch
+# The manuscript square sieve in reduced lattice coordinates
 
-This file is deliberately isolated from the accepted production modules.  It
-replaces only the higher-degree Fourier input by the unconditional
-`3 * sqrt N` rectangle estimate proved in
-`Pell.ElementaryQuadraticCharacterSieveBypass`.
+The parameterized rectangle estimate applies directly to an arbitrary odd
+homogeneous form. Reduced coordinates supply the area, perimeter and value
+height bounds; no factorization or bad-prime certificate is needed.
 -/
 
 namespace PellPaper
@@ -19,10 +18,10 @@ open scoped MatrixGroups
 
 noncomputable section
 
-/-- Unconditional intrinsic odd-homogeneous full-cell estimate.  Its
-hypothesis list intentionally matches the accepted Weil-dependent theorem,
-so all existing Main3 budget and geometric specialization code can be reused
-verbatim. -/
+/-- An arbitrary odd homogeneous polynomial satisfies the full-cell envelope
+from the manuscript's parameterized square sieve. The value-height condition
+is the only arithmetic budget; the remaining assumptions describe the
+reduced rectangle and its polynomial coefficients. -/
 theorem eventually_fullCell_oddHomogeneousPolynomial_filter_le_elementary :
     ∀ᶠ N : ℕ in atTop,
       ∀ (U V M mu delta A B : ℝ) (W : SL(2, ℤ))
@@ -38,29 +37,23 @@ theorem eventually_fullCell_oddHomogeneousPolynomial_filter_le_elementary :
         ((integerSymmetricInterval A).card : ℝ) ≤ 12 / mu →
         ((integerSymmetricInterval B).card : ℝ) ≤ 12 * mu / delta →
         A ≤ 4 * (U + V) → B ≤ 4 * (U + V) →
-        let HJ : ℕ := 2 ^ d * (d + 1) * HK
         let Wval : ℝ :=
           ((d : ℝ) + 1) * (HK : ℝ) * (4 * (U + V)) ^ d
         Real.log Wval ≤ (Real.log 2 / 16) * (N : ℝ) →
-        (∀ j : ℕ, Odd j → 0 < j → j ≤ d →
-          fullCellCertificateLogMajorant d HK j +
-              2 * Real.log (HJ : ℝ) ≤
-            (Real.log 2 / 8) * (N : ℝ)) →
         (((T.filter fun y =>
           IsSquare (MvPolynomial.eval y K) ∧
             MvPolynomial.eval y K ≠ 0).card : ℝ)) ≤
           fullCellElementarySieveEnvelope N d U V M mu := by
   filter_upwards
-    [eventually_squareSieve_oddHomogeneous_polynomial_rectangle_le_trivial,
+    [eventually_oddHomogeneous_rectangle_squareSieve,
       eventually_ge_atTop 4]
       with N hrectangle hN
   intro U V M mu delta A B W T K d HK hU hV hM hmu hdelta hsq
     hKhom hdOdd hHK hKWcoeff hCsubset harea hsideA hsideB hcoordA hcoordB
   dsimp only
-  intro hWvalBudget hcertBudget
+  intro hWvalBudget
   let KW : MvPolynomial (Fin 2) ℤ :=
     binaryLinearSubstitution (W : Matrix (Fin 2) (Fin 2) ℤ) K
-  let HJ : ℕ := 2 ^ d * (d + 1) * HK
   let Wval : ℝ := ((d : ℝ) + 1) * (HK : ℝ) * (4 * (U + V)) ^ d
   let x0 : ℤ := -⌊A⌋
   let y0 : ℤ := -⌊B⌋
@@ -69,53 +62,8 @@ theorem eventually_fullCell_oddHomogeneousPolynomial_filter_le_elementary :
   have hKWhom : KW.IsHomogeneous d :=
     binaryLinearSubstitution_isHomogeneous _ K d hKhom
   change ∀ e, |KW.coeff e| ≤ (HK : ℤ) at hKWcoeff
-  have hHJ : 0 < HJ := by dsimp [HJ]; positivity
-  have hEnvelope : 0 ≤ fullCellElementarySieveEnvelope N d U V M mu :=
-    fullCellElementarySieveEnvelope_nonnegative N d U V M mu hN
-      hU hV hM hmu
-  change ((T.filter fun y => IsSquare (MvPolynomial.eval y K) ∧
-      MvPolynomial.eval y K ≠ 0).card : ℝ) ≤
-    fullCellElementarySieveEnvelope N d U V M mu
-  by_cases hK0 : K = 0
-  · simpa [hK0] using hEnvelope
-  have hKW0 : KW ≠ 0 := binaryLinearSubstitution_sl2_ne_zero W hK0
-  obtain ⟨a, R, J, m, j, hfactor, ha, _hasq, _haHeight, hR0, hJ0,
-      hRhom, hJhom, hdegree, hj, hjpos, _hprimitive, hJcoeff,
-      hDelta0, hDeltaLog⟩ :=
-    exists_homogeneous_square_factor_with_bounded_resultant_certificate
-      KW d HK hKWhom hKW0 hdOdd hHK hKWcoeff
-  let Delta : ℤ := 2 * a * binaryProjectiveDerivativeResultant J j
-  have hjle : j ≤ d := by omega
-  have hDeltaLog' :
-      Real.log (Delta.natAbs : ℝ) ≤
-        fullCellCertificateLogMajorant d HK j := by
-    simpa only [Delta, fullCellCertificateLogMajorant] using hDeltaLog
-  have hDeltaStrong :
-      fullCellCertificateLogMajorant d HK j + 2 * Real.log (HJ : ℝ) ≤
-        (Real.log 2 / 8) * (N : ℝ) :=
-    hcertBudget j hj hjpos hjle
-  have hlogHJ : 0 ≤ Real.log (HJ : ℝ) :=
-    Real.log_nonneg (by exact_mod_cast (Nat.one_le_iff_ne_zero.mpr hHJ.ne'))
-  have hDeltaBudget :
-      Real.log (Delta.natAbs : ℝ) ≤
-        (Real.log 2 / 8) * (N : ℝ) := by
-    linarith
-  have haDelta : a ∣ Delta := by
-    refine ⟨2 * binaryProjectiveDerivativeResultant J j, ?_⟩
-    dsimp [Delta]
-    ring
   let fxy : ℕ × ℕ → ℤ := fun xy =>
     MvPolynomial.eval ![x0 + (xy.1 : ℤ), y0 + (xy.2 : ℤ)] KW
-  let rxy : ℕ × ℕ → ℤ := fun xy =>
-    MvPolynomial.eval ![x0 + (xy.1 : ℤ), y0 + (xy.2 : ℤ)] R
-  have hfactorEval : ∀ xy ∈ (Finset.range L₁).product (Finset.range L₂),
-      fxy xy = a * (rxy xy) ^ 2 *
-        MvPolynomial.eval
-          ![x0 + (xy.1 : ℤ), y0 + (xy.2 : ℤ)] J := by
-    intro xy _hxy
-    dsimp only [fxy, rxy]
-    rw [hfactor]
-    simp
   have hKWcoeffR : ∀ e, |((KW.coeff e : ℤ) : ℝ)| ≤ (HK : ℝ) := by
     intro e
     exact_mod_cast hKWcoeff e
@@ -216,8 +164,8 @@ theorem eventually_fullCell_oddHomogeneousPolynomial_filter_le_elementary :
       _ ≤ ((32 / Real.log 2) * Real.log (N : ℝ) / (N : ℝ)) *
           (144 * U * V / M) := mul_le_mul_of_nonneg_left hprod hscale
       _ = _ := by ring
-  have hsieve := hrectangle Delta a Wval J j x0 y0 L₁ L₂ fxy rxy
-    hDelta0 haDelta hDeltaBudget hWvalBudget hJhom hj hfactorEval hsize
+  have hsieve := hrectangle Wval KW d x0 y0 L₁ L₂
+    hWvalBudget hKWhom hdOdd hsize
   have hperimeterTerm :
       36 * (N : ℝ) *
           (((L₁ : ℝ) + (L₂ : ℝ)) *
@@ -266,4 +214,3 @@ end
 
 end PellPaper
 
-#print axioms PellPaper.eventually_fullCell_oddHomogeneousPolynomial_filter_le_elementary

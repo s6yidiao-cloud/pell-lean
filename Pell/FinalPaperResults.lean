@@ -1,4 +1,5 @@
 import Pell.Main3ElementaryFinalAssembly
+import Pell.PaperExceptionalDefinitions
 import Pell.ClassCutoffGrowth
 import Pell.ExceptionalMonotonicity
 import Mathlib.Analysis.SpecialFunctions.Log.Monotone
@@ -7,12 +8,10 @@ import Mathlib.Tactic
 /-!
 # The headline Pell exceptional-set theorem in `paper/main.tex`
 
-The paper counts positive nonsquare integers `D < X`.  The earlier `E` API uses
-the closed cutoff `D ≤ ⌊X⌋₊`; the filter below restores the paper's strict
-endpoint.  The uniform estimate proved by the elementary square-sieve route
-has a degree parameter `uniformQ θ`.  In the range `θ ≥ 3`, this degree is at
-most `θ`, so it implies the displayed saving in the paper with a single
-absolute constant in both the saving and the admissible range.
+The paper counts positive nonsquare integers `D < X`. The definitions in
+`PaperExceptionalDefinitions` express that strict cutoff. The uniform bound
+below uses the manuscript's split at squarefree kernel `sqrt X` and the
+squarefree estimate at parameter `2 * theta`.
 -/
 
 open Filter
@@ -21,50 +20,6 @@ open scoped Topology
 namespace PellPaper
 
 noncomputable section
-
-/-- The literal exceptional set in `paper/main.tex`, with strict real cutoff `D < X`. -/
-def paperExceptionalSet (θ X : ℝ) : Finset ℕ :=
-  (exceptionalSet θ ⌊X⌋₊).filter fun D => (D : ℝ) < X
-
-/-- The literal count `E_θ(X)` from `paper/main.tex`. -/
-def paperExceptionalCount (θ X : ℝ) : ℕ :=
-  (paperExceptionalSet θ X).card
-
-theorem mem_paperExceptionalSet {θ X : ℝ} {D : ℕ} :
-    D ∈ paperExceptionalSet θ X ↔
-      0 < D ∧ (D : ℝ) < X ∧ SmallFundamentalSolution θ D := by
-  simp only [paperExceptionalSet, Finset.mem_filter, mem_exceptionalSet,
-    Nat.one_le_iff_ne_zero, Nat.pos_iff_ne_zero]
-  constructor
-  · rintro ⟨⟨hD, _, hsmall⟩, hDX⟩
-    exact ⟨hD, hDX, hsmall⟩
-  · rintro ⟨hD, hDX, hsmall⟩
-    refine ⟨⟨hD, ?_, hsmall⟩, hDX⟩
-    exact Nat.le_floor hDX.le
-
-/-- Strict-endpoint counts are bounded by the closed-cutoff API used in the
-analytic proof. -/
-theorem paperExceptionalCount_le_E (θ X : ℝ) :
-    (paperExceptionalCount θ X : ℝ) ≤ E θ X := by
-  change ((paperExceptionalSet θ X).card : ℝ) ≤
-    ((exceptionalSet θ ⌊X⌋₊).card : ℝ)
-  unfold paperExceptionalSet
-  exact_mod_cast Finset.card_filter_le
-    (s := exceptionalSet θ ⌊X⌋₊) (p := fun D : ℕ => (D : ℝ) < X)
-
-theorem paperExceptionalCount_mono {θ φ X : ℝ} (hθφ : θ ≤ φ) :
-    paperExceptionalCount θ X ≤ paperExceptionalCount φ X := by
-  unfold paperExceptionalCount
-  apply Finset.card_le_card
-  intro D hD
-  obtain ⟨hDpos, hDX, hsmall⟩ := mem_paperExceptionalSet.mp hD
-  exact mem_paperExceptionalSet.mpr
-    ⟨hDpos, hDX, smallFundamentalSolution_mono hθφ hsmall⟩
-
-/-- In the theorem's range, the ceiling degree is no larger than `θ`. -/
-theorem uniformQ_le_theta {θ : ℝ} (hθ : 3 ≤ θ) :
-    (uniformQ θ : ℝ) ≤ θ := by
-  linarith [two_mul_uniformQ_lt hθ]
 
 /-- `paper/main.tex`, Theorem `T:uniform-exceptional`: one absolute positive `c`
 controls both the saving and the growing range, and one absolute positive `C`
@@ -76,49 +31,8 @@ theorem final_uniform_exceptional :
         θ ≤ c * Real.sqrt (Real.log X / Real.log (Real.log X)) →
         (paperExceptionalCount θ X : ℝ) ≤
           C * X ^ (1 - c / θ ^ 2) := by
-  obtain ⟨_, cExc, C, hcExc, hC, hmain⟩ :=
-    uniformExceptionalEstimate_one_div_6400_elementary_proved
-  let c : ℝ := min cExc ((1 : ℝ) / 6400)
-  have hc : 0 < c := lt_min hcExc (by norm_num)
-  have hcExc' : c ≤ cExc := min_le_left _ _
-  have hcSave : c ≤ (1 : ℝ) / 6400 := min_le_right _ _
-  refine ⟨c, C, hc, hC, ?_⟩
-  filter_upwards [hmain, eventually_ge_atTop (1 : ℝ)] with X hX hXone
-  intro θ hθ hrange
-  have hθpos : 0 < θ := by linarith
-  have hQpos : 0 < (uniformQ θ : ℝ) := uniformQ_pos hθ
-  have hQle : (uniformQ θ : ℝ) ≤ θ := uniformQ_le_theta hθ
-  have hsqrt : 0 ≤ Real.sqrt (Real.log X / Real.log (Real.log X)) :=
-    Real.sqrt_nonneg _
-  have hAdmissible : UniformAdmissible cExc θ X := by
-    unfold UniformAdmissible
-    calc
-      (uniformQ θ : ℝ) ≤ θ := hQle
-      _ ≤ c * Real.sqrt (Real.log X / Real.log (Real.log X)) := hrange
-      _ ≤ cExc * Real.sqrt (Real.log X / Real.log (Real.log X)) :=
-        mul_le_mul_of_nonneg_right hcExc' hsqrt
-  have hsave : c / θ ^ 2 ≤ ((1 : ℝ) / 6400) / (uniformQ θ : ℝ) ^ 2 := by
-    have hsq : (uniformQ θ : ℝ) ^ 2 ≤ θ ^ 2 :=
-      pow_le_pow_left₀ hQpos.le hQle _
-    have hqSq : 0 < (uniformQ θ : ℝ) ^ 2 := sq_pos_of_pos hQpos
-    have hθSq : 0 < θ ^ 2 := sq_pos_of_pos hθpos
-    apply (div_le_div_iff₀ hθSq hqSq).2
-    calc
-      c * (uniformQ θ : ℝ) ^ 2 ≤
-          ((1 : ℝ) / 6400) * (uniformQ θ : ℝ) ^ 2 :=
-        mul_le_mul_of_nonneg_right hcSave hqSq.le
-      _ ≤ ((1 : ℝ) / 6400) * θ ^ 2 :=
-        mul_le_mul_of_nonneg_left hsq (by norm_num)
-  have hexp :
-      1 - ((1 : ℝ) / 6400) / (uniformQ θ : ℝ) ^ 2 ≤
-        1 - c / θ ^ 2 := by linarith
-  have hpow := Real.rpow_le_rpow_of_exponent_le hXone hexp
-  calc
-    (paperExceptionalCount θ X : ℝ) ≤ E θ X := paperExceptionalCount_le_E θ X
-    _ ≤ C * X ^ (1 - ((1 : ℝ) / 6400) / (uniformQ θ : ℝ) ^ 2) :=
-      hX θ hθ hAdmissible
-    _ ≤ C * X ^ (1 - c / θ ^ 2) :=
-      mul_le_mul_of_nonneg_left hpow hC.le
+  obtain ⟨C, hC, hmain⟩ := uniform_exceptional_doubled_parameter
+  exact ⟨(1 : ℝ) / 3200, C, by norm_num, hC, hmain⟩
 
 /-- The logarithmic growth scale in Corollary `C:pell-unit-growth`.
 For large `D` this equals `(log D)^(3/2) / sqrt (log log D)`. -/
