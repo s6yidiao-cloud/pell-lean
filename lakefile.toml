@@ -1,0 +1,21 @@
+name = "Pell"
+version = "0.1.0"
+keywords = ["pell", "formalization"]
+defaultTargets = ["Pell"]
+
+[leanOptions]
+pp.unicode.fun = true
+relaxedAutoImplicit = false
+warningAsError = true
+
+[[require]]
+name = "TauCeti"
+path = "vendor/TauCeti"
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
+rev = "v4.33.1"
+
+[[lean_lib]]
+name = "Pell"
