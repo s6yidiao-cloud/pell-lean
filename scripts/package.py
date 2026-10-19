@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Create a source-only GitHub upload bundle without contacting any service."""
+"""Bundle Lean sources and the manuscript PDF without contacting any service."""
 
 import argparse
 import gzip
@@ -26,12 +26,14 @@ def main():
         for name in filenames:
             path = Path(directory) / name
             if not name.startswith('._') and (name in special or
-                    name.endswith(('LICENSE', 'NOTICE', 'COPYING')) or path.suffix in extensions):
+                    name.endswith(('LICENSE', 'NOTICE', 'COPYING')) or path.suffix in extensions
+                    or path == verify.ROOT / 'paper/main.pdf'):
                 files.append(path)
     licenses = {verify.ROOT / name for name in [
         'vendor/TauCeti/LICENSE', 'vendor/TauCeti/MATHLIB_LICENSE',
         'third_party/FormalPantheon-LICENSE', 'third_party/PrimeNumberTheoremAnd-LICENSE']}
     verify.require(licenses.issubset(files), 'Source bundle omits a required license file')
+    verify.require(verify.ROOT / 'paper/main.pdf' in files, 'Bundle omits the manuscript PDF')
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with args.output.open('wb') as raw, gzip.GzipFile(fileobj=raw, mode='wb', mtime=0, filename='') as compressed:
         with tarfile.open(fileobj=compressed, mode='w') as archive:
