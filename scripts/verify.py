@@ -38,6 +38,11 @@ REQUIRED_ENDPOINTS = {
     "PellPaper.final_pell_unit_growth_density",
     "PellPaper.final_fixed_power_density",
     "PellPaper.realQuadraticFieldOddClassNumber_eq_card_oddOrderClasses",
+    "PellPaper.anisotropic_sharp_squareSieve",
+    "PellPaper.uniform_exceptional_doubled_parameter",
+    "PellPaper.anisotropic_product_squareSieve",
+    "PellPaper.uniform_exceptional_E_doubled_parameter",
+    "PellPaper.uniformExceptionalEstimate_doubled_parameter",
 }
 
 
