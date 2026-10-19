@@ -37,24 +37,6 @@ The main theorem statements are in [Pell/MainResults.lean](Pell/MainResults.lean
 The [proof map](FORMALIZATION_MAP.md) lists the corresponding manuscript results
 and explains the intermediate arguments.
 
-For the class-number average, Lean proves the second-moment estimate
-
-```math
-\sum_{1 < D < X, D\text{ fundamental}} L(1,\chi_D)^2 \ll X,
-\qquad \chi_D(n)=\left(\frac{D}{n}\right).
-```
-
-Here the Kronecker symbol defines the quadratic Dirichlet character
-$\chi_D$, and $L(1,\chi_D)^2$ means the square of its Dirichlet
-$L$-function value at $s=1$.
-The sum is over positive fundamental discriminants.
-Lean then extends the class-number bound to quadratic orders of discriminant
-$D_0f^2$, where $D_0$ is fundamental and $f$ is the conductor, using a
-class-number comparison.
-The manuscript instead proves the second-moment estimate over all positive
-nonsquare order discriminants $D\equiv0,1\pmod4$.
-That extension of the $L$-value second moment is not separately formalized.
-
 [THIRD_PARTY.md](THIRD_PARTY.md) gives the sources and licenses for included
 proofs adapted from other projects.
 The [verification records](evidence/verification/) include the compiler and
