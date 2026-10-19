@@ -1,8 +1,9 @@
 # Paper-to-Lean proof map
 
-The source of record is the author's separately held TeX manuscript, SHA-256
+The [manuscript PDF](paper/main.pdf) is included. The TeX source is held
+separately and is not distributed; its SHA-256 is
 `4290745fdf5234d3f1ccc6ed24cfdc48efde043241939b726713485b700099af`.
-The manuscript source is not distributed in this repository. The source labels
+The source labels
 and line ranges below identify that private snapshot; its headline results are
 Theorems 1.1–1.3 and Corollary 1.4.
 

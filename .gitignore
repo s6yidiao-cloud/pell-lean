@@ -8,6 +8,7 @@ build/
 *.log
 *.out
 *.pdf
+!/paper/main.pdf
 *.tex
 *.toc
 *.olean

@@ -1,6 +1,7 @@
 # Preserve the checked LF source bytes on every checkout.
 *.lean text eol=lf
 *.tex text eol=lf
+*.pdf binary
 *.md text eol=lf
 *.toml text eol=lf
 *.json text eol=lf

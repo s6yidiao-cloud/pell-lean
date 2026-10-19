@@ -3,7 +3,9 @@ project: "On the average of class numbers of indefinite binary quadratic forms"
 source:
   bundled: false
   sha256: 4290745fdf5234d3f1ccc6ed24cfdc48efde043241939b726713485b700099af
-  relationship: numbered results from the author's separately held manuscript; TeX source not distributed
+  relationship: TeX source retained privately; compiled manuscript PDF included
+  pdf: paper/main.pdf
+  pdf_sha256: c028e3a863d57eaf37d84042527765499f2d5eacb9d0b15a6a7f5ee3d19a2b2f
 entry_point: Pell/MainResults.lean
 toolchain:
   lean: leanprover/lean4:v4.33.1

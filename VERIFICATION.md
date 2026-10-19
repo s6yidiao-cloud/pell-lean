@@ -14,7 +14,8 @@ The source of record is the author's separately held TeX manuscript, SHA-256:
 4290745fdf5234d3f1ccc6ed24cfdc48efde043241939b726713485b700099af
 ```
 
-The manuscript is not distributed in the current repository. Its numbered
+The [manuscript PDF](paper/main.pdf) is included; the TeX source is not
+distributed in the current repository. Its numbered
 headline results are Theorems 1.1–1.3 and Corollary 1.4.
 
 The public entry point is [`Pell/MainResults.lean`](Pell/MainResults.lean).
@@ -65,7 +66,8 @@ This is the historical build manifest preserved in `evidence/verification/`.
 After that run, the TeX source was removed from distribution, theorem numbers
 were added to the README, and the checker and packager were adjusted to use
 private-manuscript metadata without requiring a local TeX file. The current
-repository-root manifest covers 874 files. All 851 Lean sources and dependency
+repository also includes a PDF built from that same private TeX snapshot.
+The repository-root manifest covers 875 files. All 851 Lean sources and dependency
 pins remain byte-for-byte identical to the recorded build. The updated
 verification guardrails and source-integrity checks were rerun successfully;
 the historical compiler receipts have not been rewritten.

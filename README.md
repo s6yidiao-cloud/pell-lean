@@ -1,10 +1,7 @@
 # Pell: Lean formalization
 
-This standalone project proves the three main theorems and both conclusions
-of the Pell-unit corollary in **On the average of class numbers of indefinite
-binary quadratic forms**, by Yijie Diao. The numbers below follow the
-author's TeX manuscript, which is kept separately and is not distributed in
-this repository.
+This project formalizes the main results of
+[**On the average of class numbers of indefinite binary quadratic forms**](paper/main.pdf).
 
 | Manuscript result | Lean declaration in [`Pell/MainResults.lean`](Pell/MainResults.lean) |
 | --- | --- |
@@ -13,21 +10,6 @@ this repository.
 | **Theorem 1.3** — Uniform exceptional-set bound for small Pell solutions | `PellPaper.uniform_exceptional` |
 | **Corollary 1.4** — Logarithmic growth of the fundamental Pell solution | `PellPaper.pell_unit_growth_density` |
 | **Corollary 1.4** — Growth beyond every fixed power | `PellPaper.fixed_power_density` |
-
-The field/form average is bounded by
-`C X^(3/2) sqrt(log log X)/(log X)^(3/2)` for every real `X ≥ 3`.
-The odd-class average has denominator `(log X)^2`.
-The exceptional-set theorem counts actual positive nonsquare integers `D < X`
-with `ε_D ≤ D^θ`, uniformly for
-`3 ≤ θ ≤ c sqrt(log X/log log X)`, with saving `c/θ²` and one absolute
-threshold and implied constant. The corollary gives density-zero failures of
-the stated `D`-dependent logarithmic growth and of every fixed-power bound.
-
-Each endpoint is closed, with no supplied arithmetic or analytic premise.
-The foundation is pinned Mathlib plus the additional proved Lean sources
-included here. Only `propext`, `Classical.choice`, and `Quot.sound` are
-allowed in the transitive endpoint axiom audit. No unproved Weil bound or
-external numerical certificate is used.
 
 ## Build and verify
 
@@ -93,11 +75,12 @@ until the owner chooses otherwise.
 
 This directory is the repository root. It contains Lean sources,
 pinned configuration, result map, provenance, verification tools, evidence and
-CI. The TeX manuscript is excluded from Git and source bundles.
+CI, together with the [manuscript PDF](paper/main.pdf). The TeX source is
+excluded from Git and repository bundles.
 Original-code licensing remains for the owner to choose;
 upstream license notices are preserved.
 
-Create the reproducible source-only bundle locally with:
+Create the reproducible repository bundle locally with:
 
 ```sh
 python3 scripts/package.py
