@@ -22,6 +22,7 @@ results:
     additional_finiteness: PellPaper.proper_form_classes_finite
     implementation: PellPaper.final_field_class_average
     proof_variation: conductor class-number comparison instead of all-order L-value moment
+    exceptional_estimate: PellPaper.uniformExceptionalEstimate_doubled_parameter
   - source_label: "T:odd-class-average"
     source_number: "Theorem 1.2"
     declaration: PellPaper.odd_class_average
@@ -29,13 +30,16 @@ results:
     status: proved
     semantic_bridge: PellPaper.realQuadraticFieldOddClassNumber_eq_card_oddOrderClasses
     implementation: PellPaper.final_odd_class_average
+    exceptional_estimate: PellPaper.uniformExceptionalEstimate_doubled_parameter
   - source_label: "T:uniform-exceptional"
     source_number: "Theorem 1.3"
     declaration: PellPaper.uniform_exceptional
     file: Pell/MainResults.lean
     status: proved
     implementation: PellPaper.final_uniform_exceptional
-    proof_variation: budgeted square-part restoration instead of manuscript's doubled parameter
+    primary_route: manuscript doubled-parameter squarefree-kernel split and weighted summation
+    strict_definitions_file: Pell/PaperExceptionalDefinitions.lean
+    implementation_constant: "1/3200"
   - source_label: "C:pell-unit-growth"
     source_number: "Corollary 1.4"
     declarations:
@@ -43,6 +47,47 @@ results:
       - PellPaper.fixed_power_density
     file: Pell/MainResults.lean
     status: proved
+    exceptional_estimate: PellPaper.uniform_exceptional_doubled_parameter
+intermediate_results:
+  - source_label: "L:anisotropic-square"
+    declaration: PellPaper.anisotropic_sharp_squareSieve
+    file: Pell/AnisotropicSharpSquareSieve.lean
+    status: proved
+    interval_convention: closed real intervals; integer rectangle interface also included
+    bound: "K * log(2*S2)^2 * S1 * sqrt(S2)"
+    hypothesis: "C * log(2 + max(abs(f))) <= sqrt(S2)"
+    uniform_in: [polynomial, degree, intervals]
+    common_rectangle_estimate: PellPaper.eventually_oddHomogeneous_rectangle_squareSieve
+    main_producers: [balanced, unbalanced]
+    bad_prime_certificate_required: false
+  - source_label: "C:anisotropic-square"
+    declaration: PellPaper.anisotropic_product_squareSieve
+    file: Pell/AnisotropicSharpSquareSieve.lean
+    status: proved
+    interval_convention: closed real intervals; integer rectangle interface also included
+    bound: "K * log(2*S1*S2)^2 * S1^(5/4) * S2^(1/4)"
+    hypothesis: "C * log(2 + max(abs(f))) <= (S1*S2)^(1/4)"
+    uniform_in: [polynomial, degree, intervals]
+  - source_label: "T:uniform-exceptional (primary doubled-parameter proof)"
+    declaration: PellPaper.uniform_exceptional_doubled_parameter
+    inclusive_count_declaration: PellPaper.uniform_exceptional_E_doubled_parameter
+    class_average_adapter: PellPaper.uniformExceptionalEstimate_doubled_parameter
+    file: Pell/UniformDoubledParameterEstimate.lean
+    helper_file: Pell/UniformDoubledParameterRestoration.lean
+    squarefree_estimate_file: Pell/Main3ElementarySquarefreeEstimate.lean
+    logarithmic_scale_file: Pell/UniformDoubledParameterScale.lean
+    strict_definitions_file: Pell/PaperExceptionalDefinitions.lean
+    status: proved
+    constant: "1/3200"
+    inclusive_saving: "1/(1600*theta^2)"
+    degree_notation_saving: "(1/6400)/(uniformQ(theta)^2)"
+    route: actual squarefree kernel split at sqrt(X), transfer to 2*theta, weighted geometric summation
+    consumers: all headline and final endpoints, including class averages and density corollaries
+    previous_all_radicand_endpoint_dependency: false
+    obsolete_restoration_file: Pell/UniformSquarePartRestoration.lean
+    obsolete_restoration_status: import compatibility only; old proof bodies removed
+    review: evidence/verification/PRIMARY_MANUSCRIPT_REVIEW.md
+
 trust:
   foundation: pinned Mathlib and fully included proved Lean sources
   allowed_axioms:
@@ -60,8 +105,14 @@ checker:
   fresh_project_and_vendor_outputs: true
   source_manifest: SOURCE_SHA256SUMS
   literal_endpoint_type_checks: PellAudit.lean
-  required_literal_type_checks: 6
-  required_axiom_reports: 12
+  authored_modules: 857
+  required_literal_type_checks: 9
+  required_axiom_reports: 27
+  required_endpoints: 17
+  focused_compilation: passed with warnings as errors for all 67 affected modules and importing roots
+  source_import_graph: acyclic
+  current_full_fresh_build: pending
+  historical_receipts: retained for their recorded source snapshots
   independent_kernel_replay: not performed
   external_dependency_caches: reused; pinned clean source trees checked
   forbidden_tokens: [axiom, sorry, admit, sorryAx, native_decide, trustCompiler]
@@ -73,7 +124,9 @@ review:
   semantic_reviewer: separate semantic review agent
   dependency_reviewer: separate trust review agent
   independent_human_certification: false
-  source_scope: headline results; alternative intermediate proof routes documented
+  source_scope: headline results; manuscript square-sieve and doubled-parameter primary routes
+  primary_route_statement_review: independent-ai-reviewed
+  current_headline_dependency_audit: passed proof/type traversal for ten endpoints and six required leaves
   map: FORMALIZATION_MAP.md
 repository:
   intended_url: https://github.com/s6yidiao-cloud/pell-lean

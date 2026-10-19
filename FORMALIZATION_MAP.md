@@ -50,16 +50,19 @@ that every result it discusses is a completed source lemma.
 - `Definitions.lean`: `epsilon` is `x+y sqrt D`; the small-solution predicate
   uses Mathlib's positive fundamental solution. Existence and uniqueness are
   proved equivalent to a positive nonsquare radicand.
-- `FinalPaperResults.lean`: `paperExceptionalSet` restores exactly `0 < D < X`
-  from the closed-cutoff implementation API. `paperPellGrowthBadSet` uses the
-  literal `D`-dependent logarithmic expression. `uniformQ θ ≤ θ` for `θ ≥ 3`
-  transports the intermediate saving with one reduced positive constant.
+- `PaperExceptionalDefinitions.lean`: `paperExceptionalSet` restores exactly
+  `0 < D < X` from the closed-cutoff implementation API.
+  `FinalPaperResults.lean` defines `paperPellGrowthBadSet` with the literal
+  `D`-dependent logarithmic expression. The doubled-parameter estimate gives
+  the strict exceptional count with the same constant in its range and saving;
+  its degree-notation adapter also supplies the class-average estimates.
 - `classAverageScale` and `oddClassAverageScale`: the exact real powers and
   logarithms in the manuscript. Constants precede every cutoff; compact-range
   completion extends the bounds to all `X ≥ 3`.
 
-`PellAudit.lean` checks six literal endpoint types and prints endpoint types,
-core definitions, and twelve transitive-axiom lists. The semantic review checked
+`PellAudit.lean` checks nine literal endpoint types and prints endpoint types,
+core definitions, and twenty-seven transitive-axiom lists. The verifier requires
+seventeen named endpoints. The semantic review checked
 definitions, domains, constants, strict inequalities, density interpretation,
 and hidden arithmetic premises. It did not independently re-prove all
 compiler-checked algebra.
@@ -69,11 +72,11 @@ compiler-checked algebra.
 | Manuscript stage | Key Lean modules | Relationship |
 | --- | --- | --- |
 | §2, `s:pell-factorizations` | `Definitions`, `PellFactorization`, `DyadicFactorSeparation` | Mathlib fundamental solutions, Pell factorization, dyadic encoding. |
-| §3, `s:square-sieve`, `s:lattice-counting` | `DyadicBalancedSquareSieveEnvelopeElementary`, `Main3LargeAnalyticRealTwoPlaceLatticeBallGrowth` and their imports | Elementary complete-character bound, square detector, lattice completion. |
+| §3, `s:square-sieve`, `s:lattice-counting` | `AnisotropicSharpSquareSieve`, `IntrinsicOddHomogeneousPolynomialSquareSieveElementary`, `DyadicResidualFullCellSquareSieveElementary`, `Main3LargeAnalyticRealTwoPlaceLatticeBallGrowth` and their imports | Manuscript square sieve for arbitrary odd homogeneous forms, its sharp and product corollaries, and lattice completion. Both balanced and unbalanced producers use the common parameterized rectangle theorem. |
 | §4, `s:determinant-method` | `TwoLayerVanishing`, `IntegralDeterminantVanishing`, `GeneralBidegreeAuxiliaryRelation` | Determinant vanishing and exact auxiliary relations. |
 | §5, `s:balanced` | `Main3BalancedFinalElementary` | Balanced dyadic estimate. |
 | §6–7, `s:quadratic-preliminaries`, `s:unbalanced` | `ShiftedSquareReduction`, `Main3LargeAnalyticTargetFibreIdealCount`, `Main3LargeAnalyticElementaryLowerEvidence` | Shifted-square fibres, quadratic ideals and unit orbits, lattice geometry, unbalanced aggregation. |
-| §8, `s:uniform-exceptional` | `UniformSquarePartRestoration`, `Main3ElementaryFinalAssembly`, `FinalPaperResults`, `MainResults` | Square-part restoration, saving `1/6400` relative to the intermediate degree, strict cutoff, shared constant. |
+| §8, `s:uniform-exceptional` | `Main3ElementarySquarefreeEstimate`, `UniformDoubledParameterRestoration`, `UniformDoubledParameterEstimate`, `PaperExceptionalDefinitions`, `Main3ElementaryFinalAssembly`, `FinalPaperResults`, `MainResults` | Actual squarefree-kernel split at `√X`, transfer to `2θ`, weighted dyadic summation, and strict cutoff. The strict endpoint uses shared `c = 1/3200`; the degree-notation adapter gives saving `1/6400` for the class averages. |
 | §8, `s:class-number-proof` | `QuadraticSelectedLValueSecondMoment`, `QuadraticOrderConductorClassBound`, `FinalClassAverages`, `MainResults` | Fundamental L-value moment and conductor class-number comparison, then all-order average. |
 | §8, `s:odd-class-proof` | `CorollaryOddClassTauCetiGenus`, `WilsonHalfDimensionalSelbergPowerMass`, `WilsonWeightedRectangleProved`, `OddClassMeaning`, `MainResults` | Proved genus divisibility and finite weighted sieve, then the odd class sum. |
 
@@ -83,13 +86,36 @@ transfers the fundamental-discriminant class bound by a conductor class-number
 comparison. This is an alternative proved route to the same headline, not a
 formalization of that particular all-order L-value lemma.
 
-The squarefree-to-general transfer also uses an alternative route: Lean uses
-`θ+1/4` restoration with a budgeted square-part tail, while the manuscript uses
-parameter `2θ`. The implementation retains the proved product-hypothesis square
-sieve sufficient for the applications, rather than separately formalizing the
-manuscript's sharper standalone square-sieve lemma. Intermediate constants
-need not match because the headline asserts an unspecified absolute positive
-constant. No line-by-line formalization of every intermediate lemma is claimed.
+The primary squarefree-to-general proof follows the manuscript's `2θ` route:
+it splits at the actual squarefree kernel `√X`, bounds low kernels by
+`2X^(3/4)`, and sums weighted high-kernel dyadic blocks uniformly. The strong
+inclusive-count theorem `uniform_exceptional_E_doubled_parameter` gives saving
+`1/(1600θ²)`. Its strict-cutoff consequence
+`uniform_exceptional_doubled_parameter` uses `c = 1/3200` in both the growing
+range and saving. `uniformExceptionalEstimate_doubled_parameter` adapts the
+same proof to the degree notation used by the class averages. All headline
+and `final_*` endpoints use this route, including the class-average and
+density corollaries. The obsolete budgeted restoration proof bodies have
+been removed; `UniformSquarePartRestoration.lean` contains only a compatibility
+import of the new estimate.
+
+`anisotropic_sharp_squareSieve` now proves the sharper standalone
+`L:anisotropic-square`: the bound is `K log²(2S₂) S₁ √S₂` with absolute
+constants and assumption `√S₂ ≥ C log W`. No product restriction `M ≤ UV`
+occurs. The exact value height is `2 + max |f|`, and the form may have
+arbitrary odd homogeneous degree and repeated factors. The displayed real
+interval interface uses closed endpoints; a more general integer rectangle
+interface is also proved. Intermediate existential constants need not match
+particular manuscript witnesses.
+
+`anisotropic_product_squareSieve` proves `C:anisotropic-square` under
+`C log W ≤ (S₁S₂)^(1/4)`, with bound
+`K log²(2S₁S₂) S₁^(5/4) S₂^(1/4)`. Both standalone results and the balanced
+and unbalanced main-theorem estimates come from
+`eventually_oddHomogeneous_rectangle_squareSieve`. The main producers no
+longer require a factorization or bad-prime certificate to invoke this
+square-sieve theorem. Their geometric area and perimeter bounds remain
+explicit hypotheses of the reduced-coordinate adapter.
 
 ## Foundation, review, and evidence
 
@@ -106,3 +132,44 @@ Human review and independent proof-kernel replay remain unclaimed. Exact
 commands, hashes, compiler outcomes, external-cache limits, and review evidence
 are recorded in `VERIFICATION.md`, `evidence/verification/`, and the
 machine-readable status sidecar.
+
+The current source graph contains 857 authored modules and is acyclic.
+All 67 affected modules and the expanded central audit have passed direct
+Lean checks with warnings as errors. The primary-route statements and dependency changes
+have received independent AI semantic review. A fresh build of all 857
+authored modules and the expanded central audit is pending; the existing
+full-build receipts remain historical evidence for their recorded snapshots.
+
+## Manuscript intermediate arguments in the primary route
+
+Source of record: private `main_v4.tex`, SHA-256
+`4290745fdf5234d3f1ccc6ed24cfdc48efde043241939b726713485b700099af`.
+The manuscript is unchanged. Both targets were frozen and independently
+ratified before proof generation. Review tier: **Critical**, for uniform
+constants in the polynomial/degree and in the growing parameter respectively.
+
+| Source | Exact declarations and semantic closure | Status and trust |
+| --- | --- | --- |
+| `L:anisotropic-square`, lines 504–589 | `anisotropic_sharp_squareSieve_rectangle`, `anisotropic_sharp_squareSieve_intervals`, `anisotropic_sharp_squareSieve` in `Pell/AnisotropicSharpSquareSieve.lean`. Arbitrary integral homogeneous forms of odd degree; `1 ≤ S₂ ≤ S₁`; constants precede all form, degree and interval data; square count excludes zero. The final endpoint uses closed real intervals and literal `homogeneousRectangleValueHeight = 2 + sup |f|`. Zero forms are included as a strengthening. | Proved; only `propext`, `Classical.choice`, `Quot.sound`. No factorization, discriminant, coefficient or degree-dependent assumption. |
+| `C:anisotropic-square` | `anisotropic_product_squareSieve_rectangle`, `anisotropic_product_squareSieve_intervals`, `anisotropic_product_squareSieve` in `Pell/AnisotropicSharpSquareSieve.lean`. The same odd homogeneous forms and absolute constants, with product-height hypothesis and bound `K log²(2S₁S₂) S₁^(5/4) S₂^(1/4)`. The literal endpoint uses the exact value height. | Proved from the sharp rectangle lemma by enlarging a side budget while keeping the actual finite window and its value-height bound fixed. |
+| Proof of `T:uniform-exceptional`, lines 2451–2492 | `smallFundamentalSolution_doubled_of_sqrt_le`, `doubledParameterLowCover_card_le`, `exceptionalSet_subset_doubledParameter_cover` in `Pell/UniformDoubledParameterRestoration.lean`; `E_le_doubledParameter_geometric`, `uniform_exceptional_E_doubled_parameter`, `uniformExceptionalEstimate_doubled_parameter`, `uniform_exceptional_doubled_parameter` in `Pell/UniformDoubledParameterEstimate.lean`. Actual Pell small-solution predicate, unique square-part decomposition, low kernels counted by `2X^(3/4)`, actual high kernels transferred to `2θ`, and weighted geometric summation; final strict count uses literal `θ²` with shared `c = 1/3200`. | Proved; only the three standard axioms above. Ordinary dyadic scales replace the manuscript's shifted real grid; the crossing block has scale at least `√X/2`, and the actual high-kernel cutoff is used before dropping the filter. All public headline proof closures use this route. |
+
+The squarefree bound is applied to the actual count at `2θ` by monotonicity
+from the proved estimate at `2θ+1/4`. All squarefree inputs are discharged.
+The elementary logarithmic comparison is isolated in
+`UniformDoubledParameterScale.lean`; it introduces no counting premise.
+`Main3ElementarySquarefreeEstimate.lean` contains the proved squarefree stage,
+so the new assembly has no dependency cycle through the final endpoints.
+The reciprocal-square-root finite sum used in the low-kernel bound is proved
+locally without importing the class-average route.
+
+Independent statement review and file hashes are in
+[`MANUSCRIPT_EXTENSIONS_REVIEW.md`](evidence/verification/MANUSCRIPT_EXTENSIONS_REVIEW.md).
+The original extension review recorded a traversal of 3,862 project constants
+with no use of the earlier arbitrary-radicand endpoints. That count and the
+original extension-check receipts describe their historical snapshot. The
+expanded central audit now also checks the product corollary, the strong
+inclusive-count theorem and its degree adapter, and rejects obsolete proof
+routes in the headline dependencies. The verification record distinguishes
+those historical receipts from the current primary-route checks. No human
+certification or separate proof-kernel replay is claimed.

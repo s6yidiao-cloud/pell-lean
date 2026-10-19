@@ -1,7 +1,7 @@
 # Pell: Lean formalization
 
-This project formalizes the main results of
-[**On the average of class numbers of indefinite binary quadratic forms**](paper/main.pdf).
+Lean proofs of the main results in
+[*On the average of class numbers of indefinite binary quadratic forms*](paper/main.pdf).
 
 | Manuscript result | Lean declaration in [`Pell/MainResults.lean`](Pell/MainResults.lean) |
 | --- | --- |
@@ -11,11 +11,12 @@ This project formalizes the main results of
 | **Corollary 1.4** — Logarithmic growth of the fundamental Pell solution | `PellPaper.pell_unit_growth_density` |
 | **Corollary 1.4** — Growth beyond every fixed power | `PellPaper.fixed_power_density` |
 
-## Build and verify
+## Build
 
 Install [elan](https://github.com/leanprover/elan), Python 3.10 or later, and Git.
-Lean and Mathlib are pinned to `v4.33.1`; retain `lake-manifest.json`.
-From this directory:
+The project uses Lean and Mathlib `v4.33.1`.
+Keep `lean-toolchain` and `lake-manifest.json` unchanged.
+From the repository root, run:
 
 ```sh
 lake exe cache get
@@ -23,75 +24,54 @@ python3 scripts/test_verify.py
 python3 scripts/verify.py --mode direct --jobs 1
 ```
 
-The verifier creates new outputs for every Pell and vendored TauCeti module,
-including modules outside the main import closure. It reuses only pinned
-external dependency caches, checks their source revisions and tracked changes,
-promotes warnings to errors, scans for unfinished proofs, checks six literal
-endpoint types, and audits all twelve required endpoint axiom reports.
-Source, checker, packager and CI hashes are checked before and after the build.
-An initial build can take substantial time and memory.
+The verifier rebuilds all 857 local Lean modules, treats warnings as errors,
+and checks the theorem statements, axiom lists, and source hashes.
+It uses Mathlib's compiled cache.
+The same checks run in [GitHub Actions](.github/workflows/lean.yml).
+See [VERIFICATION.md](VERIFICATION.md) for results and build options.
 
-The alternative standard Lake build is
-`python3 scripts/verify.py --mode lake`. A normal checkout uses its own
-`.lake/packages` by default; `--dependencies PATH` selects an existing pinned
-external cache for direct mode. See [`VERIFICATION.md`](VERIFICATION.md) and
-[`evidence/verification/`](evidence/verification/) for recorded checks,
-commands, receipts, and environment limits.
-CI is configured in [`.github/workflows/lean.yml`](.github/workflows/lean.yml).
-GitHub Actions runs the same guardrail tests and fresh verification command.
+## Proofs
 
-## Scope and proof route
+[Pell.lean](Pell.lean) imports the formalization.
+The main theorem statements are in [Pell/MainResults.lean](Pell/MainResults.lean).
+The [proof map](FORMALIZATION_MAP.md) lists the corresponding manuscript results
+and explains the intermediate arguments.
 
-Start at [`Pell.lean`](Pell.lean) and [`Pell/MainResults.lean`](Pell/MainResults.lean).
-The [`paper-to-Lean map`](FORMALIZATION_MAP.md) records the exact semantic
-closure, proof route and scope differences. [`formalization.yaml`](formalization.yaml)
-provides machine-readable provenance and status.
+For the class-number average, Lean proves the second-moment estimate
 
-The proof starts from Mathlib's fundamental Pell solution, factors
-`(t-1)(t+1)=Du²`, and uses determinant relations, dyadic boxes, quadratic
-ideals, lattice counts, an elementary square sieve, and square-part restoration.
-The included genus-theory proof closure is rebuilt from source; adapted
-FormalPantheon and PrimeNumberTheoremAnd proofs are also included.
-See [`THIRD_PARTY.md`](THIRD_PARTY.md) for attribution, pins and licenses.
+$$
+\sum_{\substack{1<D<X\\D\text{ fundamental}}} L(1,\chi_D)^2 \ll X,
+\qquad \chi_D(n)=\left(\frac{D}{n}\right).
+$$
 
-The main results are formalized. Two intermediate arguments differ from the
-manuscript. For the class-number average, Lean passes from fundamental
-discriminants to all orders using a bound for class numbers in terms of the
-conductor, in place of the manuscript's all-order L-value second-moment
-estimate. To pass from squarefree to general radicands, Lean applies the
-squarefree estimate at `θ+1/4`, sums over small square factors, and bounds the
-contribution of large square factors separately; the manuscript uses parameter
-`2θ`.
+Here the Kronecker symbol defines the quadratic Dirichlet character
+$\chi_D$, and $L(1,\chi_D)^2$ means the square of its Dirichlet
+$L$-function value at $s=1$.
+The sum is over positive fundamental discriminants.
+Lean then extends the class-number bound to quadratic orders of discriminant
+$D_0f^2$, where $D_0$ is fundamental and $f$ is the conductor, using a
+class-number comparison.
+The manuscript instead proves the second-moment estimate over all positive
+nonsquare order discriminants $D\equiv0,1\pmod4$.
+That extension of the $L$-value second moment is not separately formalized.
 
-The square-sieve estimate proved in Lean assumes `M ≤ UV`, where `U,V` are the
-dyadic box sizes and `M` controls the subdivision by slope. This estimate
-suffices for the main theorems. The manuscript's sharper standalone square-sieve
-lemma is not separately formalized.
-
-Statement fidelity and trust have separate independent AI reviews. No
-independent human certification or independent proof-kernel replay is claimed.
-Mathlib and its pinned external dependencies use their standard compiled caches.
+[THIRD_PARTY.md](THIRD_PARTY.md) gives the sources and licenses for included
+proofs adapted from other projects.
+The [verification records](evidence/verification/) include the compiler and
+independent AI review results; they do not constitute human certification.
 
 ## Source bundle
 
-This directory is the repository root. It contains Lean sources,
-pinned configuration, result map, provenance, verification tools, evidence and
-CI, together with the [manuscript PDF](paper/main.pdf). The TeX source is
-excluded from Git and repository bundles.
-Original-code licensing remains for the owner to choose;
-upstream license notices are preserved.
-
-Create the reproducible repository bundle locally with:
+The repository includes the manuscript PDF; its TeX source is kept separately.
+To create a reproducible archive of the sources, run:
 
 ```sh
 python3 scripts/package.py
 ```
 
-It writes `build/pell-lean-source.tar.gz`, excluding caches, compiled artifacts,
-logs, Git internals, and macOS metadata. All additional proof sources are inside
-it.
+The archive is written to `build/pell-lean-source.tar.gz`.
+It excludes caches, compiled files, Git metadata, and private TeX sources.
 
-When updating the repository, commit changed files and their matching entries
-in the root `SOURCE_SHA256SUMS` together. Uploading them in separate commits
-causes CI to reject the intermediate version with a hash mismatch. Keep the
-historical manifests in `evidence/verification/` unchanged.
+When changing a file covered by `SOURCE_SHA256SUMS`, update its checksum in the
+same commit.
+Keep the historical manifests under `evidence/verification/` unchanged.

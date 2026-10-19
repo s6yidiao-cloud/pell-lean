@@ -1,111 +1,98 @@
 # Verification record
 
-**Passed.** The fresh isolated publication build compiled all **851** local
-Lean modules: 767 Pell modules, 82 vendored TauCeti modules, `Pell.lean`, and
-`PellAudit.lean`. Warnings were errors. All six literal endpoint-type
-challenges compiled, and all twelve required transitive-axiom reports contain
-exactly `propext`, `Classical.choice`, and `Quot.sound`.
+The current proofs use the manuscript's `2θ` restoration and parameterized
+square sieve in the main results. The class-number proof still uses a
+fundamental-discriminant second moment followed by a conductor comparison;
+see [README.md](README.md) for the precise difference from the manuscript.
 
-## Source and statement correspondence
+## Current checks
 
-The source of record is the author's separately held TeX manuscript, SHA-256:
+The project contains 857 local Lean modules: 773 Pell modules, 82 vendored
+TauCeti modules, the importing root, and the central audit. All 67 modules affected by the proof changes passed strict compilation,
+including the public entry point and central audit. All nine literal type
+checks and 27 axiom reports passed; every report contains exactly the three
+permitted standard axioms.
+A fresh full build of this revision is pending; its result will be recorded
+separately from the earlier successful builds below.
 
-```text
-4290745fdf5234d3f1ccc6ed24cfdc48efde043241939b726713485b700099af
-```
+[`PellAudit.lean`](PellAudit.lean) checks nine literal theorem types and
+27 transitive-axiom reports. Seventeen reports are mandatory endpoints of
+the verifier. The permitted axioms are `propext`, `Classical.choice`, and
+`Quot.sound`; unfinished proofs, custom axioms and compiler-trusted proof
+escapes are rejected. The audit also traverses the actual proofs and types
+of all five public main results and their five implementation endpoints.
+Each must use the manuscript restoration and sieve, with no dependency on
+the removed square-part restoration lemmas.
 
-The [manuscript PDF](paper/main.pdf) is included; the TeX source is not
-distributed in the current repository. Its numbered
-headline results are Theorems 1.1–1.3 and Corollary 1.4.
+The independent semantic review of this replacement is recorded in
+[`PRIMARY_MANUSCRIPT_REVIEW.md`](evidence/verification/PRIMARY_MANUSCRIPT_REVIEW.md).
+The [proof map](FORMALIZATION_MAP.md) and [status file](formalization.yaml)
+record the statements and their source correspondence.
 
-The public entry point is [`Pell/MainResults.lean`](Pell/MainResults.lean).
-Its declarations have explicit source-shaped types, with no supplied
-arithmetic or analytic premise. A separate AI reviewer inspected their
-semantic closure, including actual fields and proper forms, finiteness,
-odd-order ideal classes, strict cutoffs, exact logarithmic scales, uniform
-constants and threshold, and discriminant-dependent growth. See
-[`SEMANTIC_REVIEW.md`](evidence/verification/SEMANTIC_REVIEW.md) and the
-[`paper-to-Lean map`](FORMALIZATION_MAP.md).
+## Reproduction
 
-The proof uses a conductor comparison instead of the manuscript's all-order
-L-value moment and a budgeted square-part restoration instead of its doubled
-parameter argument. The sufficient product-hypothesis square sieve is proved;
-the manuscript's sharper standalone lemma is not separately claimed. These
-proof-route differences leave the headline conclusions unchanged.
-
-## Fresh compiler and trust checks
-
-The run took **40 minutes 13 seconds** (2412.712 seconds),
-using 3 compiler processes with 2 Lean threads each.
-Every Pell and vendored TauCeti proof object was newly compiled in one
-temporary output directory. No old project or vendor object was on its
-`LEAN_PATH`. Temporary proof objects were discarded after the gates passed.
-
-Lean is pinned to `leanprover/lean4:v4.33.1`; Mathlib is locked at
-`0df444a360eaa60ab8c11dca51a86af692955474`. All nine external Git source trees matched their
-lockfile revisions and had no tracked changes. Their standard compiled caches
-were reused. Matching source revisions do not independently establish that
-arbitrary cached objects were built from those exact sources; those caches
-remain the documented external artifact trust boundary.
-
-The unfinished-proof/native-escape scan, complete local import-graph check,
-source integrity checks before and after compilation, strict compiler checks,
-all literal type challenges, all twelve axiom reports, and final unchanged
-source checks passed. The verification guardrail regression tests also passed;
-the exact output is in [`GUARDRAILS.md`](evidence/verification/GUARDRAILS.md).
-
-The frozen manifest covers **875** source, manuscript, configuration,
-status, verification, packaging, CI, documentation and provenance/license
-files. Its SHA-256 is:
-
-```text
-d41eb07e74dcfb6bdfb5f322ed344ef488d30409888ec624679358e6f2baf062
-```
-
-This is the historical build manifest preserved in `evidence/verification/`.
-After that run, the TeX source was removed from distribution, theorem numbers
-were added to the README, and the checker and packager were adjusted to use
-private-manuscript metadata without requiring a local TeX file. The current
-repository also includes a PDF built from that same private TeX snapshot.
-The repository-root manifest covers 875 files. All 851 Lean sources and dependency
-pins remain byte-for-byte identical to the recorded build. The updated
-verification guardrails and source-integrity checks were rerun successfully;
-the historical compiler receipts have not been rewritten.
-
-## Evidence and reproduction
-
-Current evidence is in [`evidence/verification/`](evidence/verification/):
-
-- [`summary.json`](evidence/verification/summary.json): passed outcome, actual
-  compiler, dependency receipts, module count, elapsed time and all axiom lists;
-- [`modules.json`](evidence/verification/modules.json): source/object hashes
-  and compiler receipts for every local module;
-- [`AXIOM_AUDIT.md`](evidence/verification/AXIOM_AUDIT.md): actual endpoint
-  types, core definitions and raw transitive-axiom output;
-- [`SOURCE_SHA256SUMS`](evidence/verification/SOURCE_SHA256SUMS) and
-  [`source-hashes.json`](evidence/verification/source-hashes.json): the frozen
-  manifest and source-integrity receipt used by the build;
-- [`COMPILER.md`](evidence/verification/COMPILER.md),
-  [`SEMANTIC_REVIEW.md`](evidence/verification/SEMANTIC_REVIEW.md), and
-  [`TRUST_REVIEW.md`](evidence/verification/TRUST_REVIEW.md): command, scope,
-  independent AI semantic review and trust-boundary review;
-- [`PACKAGING_REVIEW.md`](evidence/verification/PACKAGING_REVIEW.md): source-only
-  archive, extraction and reproducibility checks.
-
-From a clean checkout after installing elan, Git and Python 3.10 or later:
+Install elan, Git and Python 3.10 or later, then run from the repository root:
 
 ```sh
 lake exe cache get
 python3 scripts/test_verify.py
 python3 scripts/verify.py --mode direct --jobs 1
-python3 scripts/package.py
 ```
 
-The exact local command is recorded in `COMPILER.md`. A normal checkout uses
-its own `.lake/packages` by default; `--dependencies PATH` selects an existing
-pinned external cache. Standard Lake verification is also available with
-`--mode lake`. Full local module logs remain under the ignored
-`build/verification/publication/` directory.
+Lean is pinned to `leanprover/lean4:v4.33.1`; Mathlib is locked at
+`0df444a360eaa60ab8c11dca51a86af692955474`. The verifier checks external
+source revisions and tracked-source cleanliness. It rebuilds all project
+and vendored TauCeti modules in a new temporary directory with warnings
+as errors, including modules not imported by the main results. It checks
+the source manifest before and after compilation.
 
-No independent human certification or independently implemented proof-kernel
-replay is claimed. Local verification receipts do not claim a hosted CI run.
+A normal checkout uses its own `.lake/packages`. The local command for a
+separate pinned dependency cache is:
+
+```sh
+python3 scripts/verify.py --mode direct --dependencies ../.lake/packages --jobs 3 --lean-threads 2 --logs build/verification/manuscript-primary
+```
+
+Standard Lake verification is available with `--mode lake`. GitHub Actions
+runs the guardrail tests and a fresh direct build on each relevant push.
+A hosted run is successful only when its Actions result says so.
+
+External compiled dependency caches are reused. Matching source revisions
+do not independently establish that arbitrary cached objects were built
+from those sources. No independently implemented proof-kernel replay or
+independent human certification is claimed.
+
+## Earlier successful builds
+
+These receipts describe their frozen snapshots, rather than the current
+replacement proofs. They remain unchanged.
+
+| Snapshot | Modules | Literal types | Axiom reports | Elapsed time | Receipts |
+| --- | ---: | ---: | ---: | ---: | --- |
+| Publication baseline | 851 | 6 | 12 | 2412.712 s | [`summary.json`](evidence/verification/summary.json) |
+| Standalone manuscript extensions | 854 | 8 | 22 | 946.539 s | [`summary.json`](evidence/verification/manuscript-extensions/summary.json) |
+
+Both builds passed. Every reported theorem depended on exactly the three
+permitted standard axioms. The extension build added the manuscript proofs
+as separate endpoints; the current revision replaces the main proof routes
+with them.
+
+Each receipt directory includes `modules.json` with source and object hashes,
+`source-hashes.json` and `SOURCE_SHA256SUMS` for the frozen inputs,
+`AXIOM_AUDIT.md` with actual theorem types and raw axiom output, and
+`COMPILER.md` with the command and compiler details. The original baseline
+also includes semantic, trust, packaging and guardrail reviews.
+
+## Manuscript provenance
+
+The source of record is the author's separately held `main_v4.tex`, SHA-256:
+
+```text
+4290745fdf5234d3f1ccc6ed24cfdc48efde043241939b726713485b700099af
+```
+
+The [PDF](paper/main.pdf) is included; the TeX source is kept separately.
+The numbered main results are Theorems 1.1–1.3 and Corollary 1.4.
+The original [semantic review](evidence/verification/SEMANTIC_REVIEW.md)
+checks fields, proper forms, finiteness, odd-order ideal classes, cutoffs,
+logarithmic scales, uniform constants and discriminant-dependent growth.
