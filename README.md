@@ -38,7 +38,7 @@ external cache for direct mode. See [`VERIFICATION.md`](VERIFICATION.md) and
 [`evidence/verification/`](evidence/verification/) for recorded checks,
 commands, receipts, and environment limits.
 CI is configured in [`.github/workflows/lean.yml`](.github/workflows/lean.yml).
-The prepared workflow has not yet been credited with a hosted run.
+GitHub Actions runs the same guardrail tests and fresh verification command.
 
 ## Scope and proof route
 
@@ -54,24 +54,25 @@ The included genus-theory proof closure is rebuilt from source; adapted
 FormalPantheon and PrimeNumberTheoremAnd proofs are also included.
 See [`THIRD_PARTY.md`](THIRD_PARTY.md) for attribution, pins and licenses.
 
-This formalizes the main results. Two proved intermediate routes differ from
-the manuscript: conductor class-number comparison replaces the all-order
-L-value moment, and Lean uses `θ+1/4` restoration with a budgeted square-part
-tail while the manuscript uses parameter `2θ`. The manuscript's sharper
-standalone square-sieve lemma is not claimed as an independently formalized
-result; the proof uses the product-hypothesis estimate sufficient for the main
-theorems.
+The main results are formalized. Two intermediate arguments differ from the
+manuscript. For the class-number average, Lean passes from fundamental
+discriminants to all orders using a bound for class numbers in terms of the
+conductor, in place of the manuscript's all-order L-value second-moment
+estimate. To pass from squarefree to general radicands, Lean applies the
+squarefree estimate at `θ+1/4`, sums over small square factors, and bounds the
+contribution of large square factors separately; the manuscript uses parameter
+`2θ`.
+
+The square-sieve estimate proved in Lean assumes `M ≤ UV`, where `U,V` are the
+dyadic box sizes and `M` controls the subdivision by slope. This estimate
+suffices for the main theorems. The manuscript's sharper standalone square-sieve
+lemma is not separately formalized.
 
 Statement fidelity and trust have separate independent AI reviews. No
 independent human certification or independent proof-kernel replay is claimed.
 Mathlib and its pinned external dependencies use their standard compiled caches.
 
-## Repository access and source bundle
-
-This is a private working repository. Access requires signing in to a GitHub
-account authorized by the owner; private GitHub repositories do not offer a
-shared passcode for anonymous visitors. Repository access should remain private
-until the owner chooses otherwise.
+## Source bundle
 
 This directory is the repository root. It contains Lean sources,
 pinned configuration, result map, provenance, verification tools, evidence and
@@ -89,3 +90,8 @@ python3 scripts/package.py
 It writes `build/pell-lean-source.tar.gz`, excluding caches, compiled artifacts,
 logs, Git internals, and macOS metadata. All additional proof sources are inside
 it.
+
+When updating the repository, commit changed files and their matching entries
+in the root `SOURCE_SHA256SUMS` together. Uploading them in separate commits
+causes CI to reject the intermediate version with a hash mismatch. Keep the
+historical manifests in `evidence/verification/` unchanged.
