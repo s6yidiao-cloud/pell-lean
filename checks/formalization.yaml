@@ -6,18 +6,19 @@ source:
   relationship: TeX source retained privately; compiled manuscript PDF included
   pdf: paper/main.pdf
   pdf_sha256: c028e3a863d57eaf37d84042527765499f2d5eacb9d0b15a6a7f5ee3d19a2b2f
-entry_point: Pell/MainResults.lean
+entry_point: formalization/Pell/MainResults.lean
+library_root: formalization/Pell.lean
 toolchain:
   lean: leanprover/lean4:v4.33.1
   mathlib_tag: v4.33.1
   mathlib_commit: 0df444a360eaa60ab8c11dca51a86af692955474
-  lockfile: lake-manifest.json
-  vendor: vendor/TauCeti
+  lockfile: formalization/lake-manifest.json
+  vendor: formalization/vendor/TauCeti
 results:
   - source_label: "T:field-class-average"
     source_number: "Theorem 1.1"
     declaration: PellPaper.field_class_average
-    file: Pell/MainResults.lean
+    file: formalization/Pell/MainResults.lean
     status: proved
     additional_finiteness: PellPaper.proper_form_classes_finite
     implementation: PellPaper.final_field_class_average
@@ -26,7 +27,7 @@ results:
   - source_label: "T:odd-class-average"
     source_number: "Theorem 1.2"
     declaration: PellPaper.odd_class_average
-    file: Pell/MainResults.lean
+    file: formalization/Pell/MainResults.lean
     status: proved
     semantic_bridge: PellPaper.realQuadraticFieldOddClassNumber_eq_card_oddOrderClasses
     implementation: PellPaper.final_odd_class_average
@@ -34,24 +35,24 @@ results:
   - source_label: "T:uniform-exceptional"
     source_number: "Theorem 1.3"
     declaration: PellPaper.uniform_exceptional
-    file: Pell/MainResults.lean
+    file: formalization/Pell/MainResults.lean
     status: proved
     implementation: PellPaper.final_uniform_exceptional
     primary_route: manuscript doubled-parameter squarefree-kernel split and weighted summation
-    strict_definitions_file: Pell/PaperExceptionalDefinitions.lean
+    strict_definitions_file: formalization/Pell/PaperExceptionalDefinitions.lean
     implementation_constant: "1/3200"
   - source_label: "C:pell-unit-growth"
     source_number: "Corollary 1.4"
     declarations:
       - PellPaper.pell_unit_growth_density
       - PellPaper.fixed_power_density
-    file: Pell/MainResults.lean
+    file: formalization/Pell/MainResults.lean
     status: proved
     exceptional_estimate: PellPaper.uniform_exceptional_doubled_parameter
 intermediate_results:
   - source_label: "L:anisotropic-square"
     declaration: PellPaper.anisotropic_sharp_squareSieve
-    file: Pell/AnisotropicSharpSquareSieve.lean
+    file: formalization/Pell/AnisotropicSharpSquareSieve.lean
     status: proved
     interval_convention: closed real intervals; integer rectangle interface also included
     bound: "K * log(2*S2)^2 * S1 * sqrt(S2)"
@@ -62,7 +63,7 @@ intermediate_results:
     bad_prime_certificate_required: false
   - source_label: "C:anisotropic-square"
     declaration: PellPaper.anisotropic_product_squareSieve
-    file: Pell/AnisotropicSharpSquareSieve.lean
+    file: formalization/Pell/AnisotropicSharpSquareSieve.lean
     status: proved
     interval_convention: closed real intervals; integer rectangle interface also included
     bound: "K * log(2*S1*S2)^2 * S1^(5/4) * S2^(1/4)"
@@ -72,11 +73,11 @@ intermediate_results:
     declaration: PellPaper.uniform_exceptional_doubled_parameter
     inclusive_count_declaration: PellPaper.uniform_exceptional_E_doubled_parameter
     class_average_adapter: PellPaper.uniformExceptionalEstimate_doubled_parameter
-    file: Pell/UniformDoubledParameterEstimate.lean
-    helper_file: Pell/UniformDoubledParameterRestoration.lean
-    squarefree_estimate_file: Pell/Main3ElementarySquarefreeEstimate.lean
-    logarithmic_scale_file: Pell/UniformDoubledParameterScale.lean
-    strict_definitions_file: Pell/PaperExceptionalDefinitions.lean
+    file: formalization/Pell/UniformDoubledParameterEstimate.lean
+    helper_file: formalization/Pell/UniformDoubledParameterRestoration.lean
+    squarefree_estimate_file: formalization/Pell/Main3ElementarySquarefreeEstimate.lean
+    logarithmic_scale_file: formalization/Pell/UniformDoubledParameterScale.lean
+    strict_definitions_file: formalization/Pell/PaperExceptionalDefinitions.lean
     status: proved
     constant: "1/3200"
     inclusive_saving: "1/(1600*theta^2)"
@@ -84,9 +85,9 @@ intermediate_results:
     route: actual squarefree kernel split at sqrt(X), transfer to 2*theta, weighted geometric summation
     consumers: all headline and final endpoints, including class averages and density corollaries
     previous_all_radicand_endpoint_dependency: false
-    obsolete_restoration_file: Pell/UniformSquarePartRestoration.lean
+    obsolete_restoration_file: formalization/Pell/UniformSquarePartRestoration.lean
     obsolete_restoration_status: import compatibility only; old proof bodies removed
-    review: evidence/verification/PRIMARY_MANUSCRIPT_REVIEW.md
+    review: checks/records/PRIMARY_MANUSCRIPT_REVIEW.md
 
 trust:
   foundation: pinned Mathlib and fully included proved Lean sources
@@ -98,32 +99,35 @@ trust:
   placeholders: 0
   external_mathematical_inputs: []
   external_numerical_certificates: []
-  audit_file: PellAudit.lean
+  audit_file: checks/PellAudit.lean
 checker:
   script: scripts/verify.py
   warnings_as_errors: true
   fresh_project_and_vendor_outputs: true
-  source_manifest: SOURCE_SHA256SUMS
-  literal_endpoint_type_checks: PellAudit.lean
+  source_manifest: checks/SOURCE_SHA256SUMS
+  source_policy: snapshot current file contents by default; require release manifest with --frozen
+  literal_endpoint_type_checks: checks/PellAudit.lean
   authored_modules: 857
   required_literal_type_checks: 9
   required_axiom_reports: 27
   required_endpoints: 17
   focused_compilation: passed with warnings as errors for all 67 affected modules and importing roots
   source_import_graph: acyclic
-  current_full_fresh_build: passed
-  current_full_build_receipt: evidence/verification/manuscript-primary-ci/summary.json
-  current_full_build_source_commit: 52ace63b6294009c1a7633d7466302a1efc3e4be
-  current_full_build_ci_run: https://github.com/s6yidiao-cloud/pell-lean/actions/runs/39291683619
-  current_full_build_elapsed_seconds: 2233.681
-  current_full_build_input_manifest_sha256: af22bfef63093774593ec7f16291452f6088bc641d22e79d7fbc2099fc94f467
-  current_snapshot_boundary: documentation and receipt followups only; all Lean source hashes match CI, proofs and verifier unchanged
+  current_full_fresh_build: not_run_after_layout_and_verifier_changes
+  latest_recorded_full_fresh_build: passed
+  latest_recorded_full_build_receipt: checks/records/manuscript-primary-ci/summary.json
+  latest_recorded_full_build_source_commit: 52ace63b6294009c1a7633d7466302a1efc3e4be
+  latest_recorded_full_build_ci_run: https://github.com/s6yidiao-cloud/pell-lean/actions/runs/39291683619
+  latest_recorded_full_build_elapsed_seconds: 2233.681
+  latest_recorded_full_build_input_manifest_sha256: af22bfef63093774593ec7f16291452f6088bc641d22e79d7fbc2099fc94f467
+  current_snapshot_boundary: repository layout, verifier, packaging, and documentation updated; all Lean source contents match the recorded CI build
+  proof_source_contents_match_recorded_build: true
   historical_receipts: retained for their recorded source snapshots
   independent_kernel_replay: not performed
   external_dependency_caches: reused; pinned clean source trees checked
   forbidden_tokens: [axiom, sorry, admit, sorryAx, native_decide, trustCompiler]
-  evidence_record: VERIFICATION.md
-  evidence_directory: evidence/verification
+  evidence_record: docs/verification.md
+  evidence_directory: checks/records
 review:
   tier: critical
   paper_to_lean: independent-ai-reviewed
@@ -133,7 +137,7 @@ review:
   source_scope: headline results; manuscript square-sieve and doubled-parameter primary routes
   primary_route_statement_review: independent-ai-reviewed
   current_headline_dependency_audit: passed proof/type traversal for ten endpoints and six required leaves
-  map: FORMALIZATION_MAP.md
+  map: docs/proof-map.md
 repository:
   intended_url: https://github.com/s6yidiao-cloud/pell-lean
   visibility: private
