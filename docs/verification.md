@@ -1,26 +1,24 @@
 # Verification
 
-## Recorded full build
+## Current verification
 
-[GitHub Actions run #9](https://github.com/s6yidiao-cloud/pell-lean/actions/runs/39291683619)
-passed for source commit `52ace63b6294009c1a7633d7466302a1efc3e4be`.
-It rebuilt all 857 local Lean modules: 773 Pell modules, 82 vendored TauCeti
-modules, the importing root, and the central audit. All nine literal type
-checks and 27 axiom reports passed, including seventeen mandatory endpoints.
-Every report contained exactly `propext`, `Classical.choice`, and `Quot.sound`.
-The verifier took 2233.681 seconds on Linux with Lean 4.33.1, one build job,
-and two Lean threads.
+Both [pell-lean run #14](https://github.com/s6yidiao-cloud/pell-lean/actions/runs/39362153247)
+and [pell-lean-release run #3](https://github.com/s6yidiao-cloud/pell-lean-release/actions/runs/39362161020)
+passed for source commit `ea6bac672a9b9c6b937eacc98fe54ab576a04f90`.
+Each rebuilt all 857 local Lean modules: 773 Pell modules, 82 vendored TauCeti
+modules, the library entry point, and the audit. All nine literal type checks,
+ten proof-route checks, and 27 axiom reports passed, including seventeen
+mandatory endpoints. Every report contained exactly `propext`,
+`Classical.choice`, and `Quot.sound`. All 19 guardrail tests passed.
 
-The [full receipt](../checks/records/manuscript-primary-ci/summary.json) and
-[compiler record](../checks/records/manuscript-primary-ci/COMPILER.md) preserve
-that run. Its input manifest has SHA-256
-`af22bfef63093774593ec7f16291452f6088bc641d22e79d7fbc2099fc94f467` and is
-retained in [the receipt directory](../checks/records/manuscript-primary-ci/SOURCE_SHA256SUMS).
-
-The current layout preserves all 857 Lean source files byte for byte from
-that compiled snapshot. The directory structure, verifier, and source-packaging
-workflow have since changed; the recorded run does not certify those changes.
-Historical receipts retain their original paths and commands.
+The [main receipt](../checks/records/layout-ci/summary.json),
+[release receipt](../checks/records/layout-ci/release-summary.json), and
+[compiler record](../checks/records/layout-ci/COMPILER.md) preserve the results.
+Both runs checked the same input snapshot, SHA-256
+`d4ce46eb30bc7da9e956fa3460cf55c5fb08712d631bdf180d26ac08268a3737`.
+The workflows took 53m 46s and 49m 21s respectively. These records and status
+updates were added afterward; all Lean sources, checker scripts, dependency
+configuration, and the CI workflow still match the checked inputs.
 
 ## Reproduction
 
@@ -93,8 +91,9 @@ These unchanged receipts describe their own frozen snapshots.
 | --- | ---: | ---: | ---: | ---: | --- |
 | Publication baseline | 851 | 6 | 12 | 2412.712 s | [summary](../checks/records/summary.json) |
 | Standalone manuscript extensions | 854 | 8 | 22 | 946.539 s | [summary](../checks/records/manuscript-extensions/summary.json) |
+| Manuscript main proof routes | 857 | 9 | 27 | 2233.681 s | [summary](../checks/records/manuscript-primary-ci/summary.json) |
 
-Both passed, with exactly the three permitted standard axioms in each report.
+All three passed, with exactly the three permitted standard axioms in each report.
 The extension build added the manuscript proofs as separate endpoints; run #9
 checked their use in the main results. Each receipt directory contains source
 and object hashes, actual theorem types, raw axiom output, and compiler details.

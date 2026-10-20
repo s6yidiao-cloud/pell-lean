@@ -17,3 +17,6 @@ vendor directory. All listed third-party code is Apache-2.0. See the root
 
 The original Pell Lean code is licensed under the root [Apache-2.0
 license](../LICENSE). The manuscript PDF is outside the code license.
+
+Some preserved source headers refer to the former `third_party/` directory.
+Those license texts are now in [`docs/licenses/`](licenses/).
