@@ -42,18 +42,6 @@ Documentation-only changes skip Lean CI. See
 - [`paper/`](paper/) contains the manuscript PDF; the TeX source is held separately.
 - [`scripts/`](scripts/) contains verification and source-packaging tools.
 
-## Source bundle
-
-```sh
-python3 scripts/package.py
-```
-
-This writes `build/pell-lean-source.tar.gz` with a freshly generated source
-manifest; routine documentation edits need no manual checksum updates.
-Caches, compiled files, Git metadata, and private TeX sources are
-excluded. Historical records under [`checks/records/`](checks/records/) retain
-the exact contents of their recorded snapshots.
-
 ## License
 
 The original Lean code is licensed under [Apache 2.0](LICENSE). Third-party
