@@ -2,7 +2,29 @@ name: Fresh Lean verification
 
 on:
   push:
+    paths-ignore:
+      - '.gitattributes'
+      - '.gitignore'
+      - 'README.md'
+      - 'docs/**'
+      - 'paper/**'
+      - 'CITATION.cff'
+      - 'LICENSE'
+      - 'NOTICE'
+      - 'checks/records/**'
+      - 'checks/SOURCE_SHA256SUMS'
   pull_request:
+    paths-ignore:
+      - '.gitattributes'
+      - '.gitignore'
+      - 'README.md'
+      - 'docs/**'
+      - 'paper/**'
+      - 'CITATION.cff'
+      - 'LICENSE'
+      - 'NOTICE'
+      - 'checks/records/**'
+      - 'checks/SOURCE_SHA256SUMS'
   workflow_dispatch:
 
 permissions:
@@ -16,18 +38,56 @@ jobs:
       LEAN_NUM_THREADS: "2"
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Check verification guardrails
+        run: python3 -m unittest discover -s scripts -p 'test_*.py'
       # Install the version in lean-toolchain and fetch only Mathlib's cache.
       # No project or vendor build cache is restored.
-      - uses: leanprover/lean-action@24581d74d674803a25a81b10b059c5c0cdd344c6 # v1
+      # Retry setup at most three times; verification below is never retried.
+      - name: Set up Lean and Mathlib (attempt 1 of 3)
+        id: setup_1
+        continue-on-error: true
+        timeout-minutes: 30
+        uses: leanprover/lean-action@24581d74d674803a25a81b10b059c5c0cdd344c6 # v1
         with:
+          lake-package-directory: formalization
           auto-config: "false"
           build: "false"
           test: "false"
           lint: "false"
           use-github-cache: "false"
           use-mathlib-cache: "true"
-      - name: Check verification guardrails
-        run: python3 scripts/test_verify.py
+      - name: Prepare setup retry after 15 seconds
+        if: ${{ !cancelled() && steps.setup_1.outcome == 'failure' }}
+        run: sleep 15
+      - name: Set up Lean and Mathlib (attempt 2 of 3)
+        id: setup_2
+        if: ${{ !cancelled() && steps.setup_1.outcome == 'failure' }}
+        continue-on-error: true
+        timeout-minutes: 30
+        uses: leanprover/lean-action@24581d74d674803a25a81b10b059c5c0cdd344c6 # v1
+        with:
+          lake-package-directory: formalization
+          auto-config: "false"
+          build: "false"
+          test: "false"
+          lint: "false"
+          use-github-cache: "false"
+          use-mathlib-cache: "true"
+      - name: Prepare final setup retry after 30 seconds
+        if: ${{ !cancelled() && steps.setup_2.outcome == 'failure' }}
+        run: sleep 30
+      - name: Set up Lean and Mathlib (attempt 3 of 3)
+        if: ${{ !cancelled() && steps.setup_2.outcome == 'failure' }}
+        timeout-minutes: 30
+        uses: leanprover/lean-action@24581d74d674803a25a81b10b059c5c0cdd344c6 # v1
+        with:
+          lake-package-directory: formalization
+          auto-config: "false"
+          build: "false"
+          test: "false"
+          lint: "false"
+          use-github-cache: "false"
+          use-mathlib-cache: "true"
       - name: Fresh direct elaboration and endpoint audit
         run: python3 scripts/verify.py --mode direct --jobs 1
       - name: Preserve verification logs
