@@ -1,7 +1,18 @@
+# Dependencies and build outputs
 .lake/
 build/
+*.olean
+*.ilean
+*.c
+*.o
+__pycache__/
+*.pyc
+
+# Local filesystem metadata
 .DS_Store
 ._*
+
+# Manuscript sources and generated files
 *.aux
 *.fdb_latexmk
 *.fls
@@ -11,9 +22,3 @@ build/
 !/paper/main.pdf
 *.tex
 *.toc
-*.olean
-*.ilean
-*.c
-*.o
-__pycache__/
-*.pyc
