@@ -1,0 +1,21 @@
+Pell: Lean formalization of
+On the average of class numbers of indefinite binary quadratic forms
+
+Copyright 2026 Yijie Diao.
+The original Lean code is licensed under the Apache License, Version 2.0;
+see LICENSE. The manuscript PDF is not covered by this code license.
+
+This repository includes or adapts Apache-2.0 Lean proofs from:
+
+- TauCeti, snapshot 686d8bf2bd972c14c9d3e080024a7001addf0660.
+  License: formalization/vendor/TauCeti/LICENSE.
+- FormalPantheon, commit ffbb65c21afc8a36ace67720f1b0df1c63d26bd1.
+  License: docs/licenses/FormalPantheon-LICENSE.
+- PrimeNumberTheoremAnd, commit a5154676af9aa3095150ee410cdda80555aa0642.
+  License: docs/licenses/PrimeNumberTheoremAnd-LICENSE.
+- Mathlib, including a compatibility proof in the vendored TauCeti source.
+  License: formalization/vendor/TauCeti/MATHLIB_LICENSE.
+
+Copyright, author, and modification notices remain in the source headers.
+See docs/third-party.md and formalization/vendor/TauCeti/PROVENANCE.md for
+attribution and source details, including TauCeti's FLT-derived proofs.
