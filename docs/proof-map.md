@@ -1,6 +1,6 @@
 # Paper-to-Lean proof map
 
-The [manuscript PDF](paper/main.pdf) is included. The TeX source is held
+The [manuscript PDF](../paper/main.pdf) is included. The TeX source is held
 separately and is not distributed; its SHA-256 is
 `4290745fdf5234d3f1ccc6ed24cfdc48efde043241939b726713485b700099af`.
 The source labels
@@ -14,14 +14,14 @@ arithmetic objects, finiteness, and uniform quantifiers determine whether the
 formalization proves the requested mathematics. Separate AI semantic and trust
 reviews inspected these interfaces. No independent human certification is
 claimed. Compiler outcomes and the exact frozen source are recorded separately
-in [`VERIFICATION.md`](VERIFICATION.md) and `evidence/verification/`.
+in [verification](verification.md) and `checks/records/`.
 
 | Source label and lines | Intended statement | Exact Lean declaration | Status and trust | Scope difference |
 | --- | --- | --- | --- | --- |
-| `T:field-class-average`, 134–141 | For every real `X ≥ 3`, the actual field class-number sum is at most the proper primitive form-class sum over all positive nonsquare `D ≡ 0,1 mod 4`, `D < X`; the latter is bounded by one constant times `X^(3/2) sqrt(log log X)/(log X)^(3/2)`. | `PellPaper.field_class_average`, `Pell/MainResults.lean` | Closed proof from `final_field_class_average.2`; accepted axioms only. | None in the displayed result. Finiteness of every form quotient is also proved separately. |
-| `T:odd-class-average`, 197–203 | One constant bounds the sum of the numbers of odd-order ordinary ideal classes over the same fields by `X^(3/2) sqrt(log log X)/(log X)^2` for every real `X ≥ 3`. | `PellPaper.odd_class_average`, `Pell/MainResults.lean` | Closed proof from `final_odd_class_average`; accepted axioms only. | None; the odd-part representation has a proved literal interpretation. |
-| `T:uniform-exceptional`, 243–251 | Absolute positive `c,C` and one threshold in `X` give `E_θ(X) ≤ C X^(1-c/θ²)`, uniformly for `3 ≤ θ ≤ c sqrt(log X/log log X)`. | `PellPaper.uniform_exceptional`, `Pell/MainResults.lean` | Closed proof from `final_uniform_exceptional`; accepted axioms only. | None: strict cutoff, same `c` in range and saving, and threshold before `∀ θ`. |
-| `C:pell-unit-growth`, 256–263 | Density-zero failures of `log ε_D ≥ c (log D)^(3/2)/sqrt(log log D)` for an absolute positive `c`, and of `ε_D > D^θ` for each fixed `θ > 0`. | `PellPaper.pell_unit_growth_density`, `PellPaper.fixed_power_density`, `Pell/MainResults.lean` | Closed proofs from the corresponding `final_*` endpoints; accepted axioms only. | The first failure set uses `≤`, so its complement gives the stronger strict lower bound. Division by `X` gives the same density-one meaning among nonsquares, since squares have density zero. |
+| `T:field-class-average`, 134–141 | For every real `X ≥ 3`, the actual field class-number sum is at most the proper primitive form-class sum over all positive nonsquare `D ≡ 0,1 mod 4`, `D < X`; the latter is bounded by one constant times `X^(3/2) sqrt(log log X)/(log X)^(3/2)`. | `PellPaper.field_class_average`, `formalization/Pell/MainResults.lean` | Closed proof from `final_field_class_average.2`; accepted axioms only. | None in the displayed result. Finiteness of every form quotient is also proved separately. |
+| `T:odd-class-average`, 197–203 | One constant bounds the sum of the numbers of odd-order ordinary ideal classes over the same fields by `X^(3/2) sqrt(log log X)/(log X)^2` for every real `X ≥ 3`. | `PellPaper.odd_class_average`, `formalization/Pell/MainResults.lean` | Closed proof from `final_odd_class_average`; accepted axioms only. | None; the odd-part representation has a proved literal interpretation. |
+| `T:uniform-exceptional`, 243–251 | Absolute positive `c,C` and one threshold in `X` give `E_θ(X) ≤ C X^(1-c/θ²)`, uniformly for `3 ≤ θ ≤ c sqrt(log X/log log X)`. | `PellPaper.uniform_exceptional`, `formalization/Pell/MainResults.lean` | Closed proof from `final_uniform_exceptional`; accepted axioms only. | None: strict cutoff, same `c` in range and saving, and threshold before `∀ θ`. |
+| `C:pell-unit-growth`, 256–263 | Density-zero failures of `log ε_D ≥ c (log D)^(3/2)/sqrt(log log D)` for an absolute positive `c`, and of `ε_D > D^θ` for each fixed `θ > 0`. | `PellPaper.pell_unit_growth_density`, `PellPaper.fixed_power_density`, `formalization/Pell/MainResults.lean` | Closed proofs from the corresponding `final_*` endpoints; accepted axioms only. | The first failure set uses `≤`, so its complement gives the stronger strict lower bound. Division by `X` gives the same density-one meaning among nonsquares, since squares have density zero. |
 
 These are closed proofs rather than conditional interfaces. Intermediate
 reductions retain explicit hypotheses in their theorem types; the final
@@ -60,7 +60,7 @@ that every result it discusses is a completed source lemma.
   logarithms in the manuscript. Constants precede every cutoff; compact-range
   completion extends the bounds to all `X ≥ 3`.
 
-`PellAudit.lean` checks nine literal endpoint types and prints endpoint types,
+[`checks/PellAudit.lean`](../checks/PellAudit.lean) checks nine literal endpoint types and prints endpoint types,
 core definitions, and twenty-seven transitive-axiom lists. The verifier requires
 seventeen named endpoints. The semantic review checked
 definitions, domains, constants, strict inequalities, density interpretation,
@@ -121,7 +121,7 @@ explicit hypotheses of the reduced-coordinate adapter.
 
 The foundation is pinned Mathlib with all additional proved Lean source
 included. Vendored TauCeti genus theory and adapted third-party files are
-compiled from source; see [`THIRD_PARTY.md`](THIRD_PARTY.md). There are no
+compiled from source; see [third-party provenance](third-party.md). There are no
 external arithmetic axioms or numerical certificates in the headline route.
 Only `propext`, `Classical.choice`, and `Quot.sound` are permitted; `sorryAx`
 and `Lean.trustCompiler` are rejected.
@@ -130,20 +130,20 @@ The critical semantic review was performed by a separate AI agent from the
 one preparing the public aliases. Another agent audited trust and dependencies.
 Human review and independent proof-kernel replay remain unclaimed. Exact
 commands, hashes, compiler outcomes, external-cache limits, and review evidence
-are recorded in `VERIFICATION.md`, `evidence/verification/`, and the
-machine-readable status sidecar.
+are recorded in [verification](verification.md), `checks/records/`, and the
+[machine-readable status](../checks/formalization.yaml).
 
-The current source graph contains 857 authored modules and is acyclic.
-The [fresh GitHub Actions build](https://github.com/s6yidiao-cloud/pell-lean/actions/runs/39291683619)
+The source graph contains 857 local Lean modules and is acyclic.
+The [recorded GitHub Actions build](https://github.com/s6yidiao-cloud/pell-lean/actions/runs/39291683619)
 passed for commit `52ace63b6294009c1a7633d7466302a1efc3e4be`: all 857 modules,
 nine literal types, 27 axiom reports and seventeen mandatory endpoints.
-The [`summary.json`](evidence/verification/manuscript-primary-ci/summary.json)
-records the 2233.681-second verifier run. All current Lean sources match the
-compiled snapshot; subsequent changes are documentation and receipt followups
-only, with proofs and verifier unchanged. The primary-route statements and
-dependencies also passed [independent AI review](evidence/verification/PRIMARY_MANUSCRIPT_REVIEW.md).
-Earlier full-build receipts remain historical evidence for their recorded
-snapshots.
+The [receipt](../checks/records/manuscript-primary-ci/summary.json) records the
+2233.681-second verifier run. Current Lean source contents match that snapshot;
+the repository layout, verifier, and packaging workflow have since changed.
+The recorded build applies to its original snapshot. The primary-route
+statements and dependencies also passed
+[independent AI review](../checks/records/PRIMARY_MANUSCRIPT_REVIEW.md).
+All receipts remain unchanged, including their original paths and commands.
 
 ## Manuscript intermediate arguments in the primary route
 
@@ -155,9 +155,9 @@ constants in the polynomial/degree and in the growing parameter respectively.
 
 | Source | Exact declarations and semantic closure | Status and trust |
 | --- | --- | --- |
-| `L:anisotropic-square`, lines 504–589 | `anisotropic_sharp_squareSieve_rectangle`, `anisotropic_sharp_squareSieve_intervals`, `anisotropic_sharp_squareSieve` in `Pell/AnisotropicSharpSquareSieve.lean`. Arbitrary integral homogeneous forms of odd degree; `1 ≤ S₂ ≤ S₁`; constants precede all form, degree and interval data; square count excludes zero. The final endpoint uses closed real intervals and literal `homogeneousRectangleValueHeight = 2 + sup |f|`. Zero forms are included as a strengthening. | Proved; only `propext`, `Classical.choice`, `Quot.sound`. No factorization, discriminant, coefficient or degree-dependent assumption. |
-| `C:anisotropic-square` | `anisotropic_product_squareSieve_rectangle`, `anisotropic_product_squareSieve_intervals`, `anisotropic_product_squareSieve` in `Pell/AnisotropicSharpSquareSieve.lean`. The same odd homogeneous forms and absolute constants, with product-height hypothesis and bound `K log²(2S₁S₂) S₁^(5/4) S₂^(1/4)`. The literal endpoint uses the exact value height. | Proved from the sharp rectangle lemma by enlarging a side budget while keeping the actual finite window and its value-height bound fixed. |
-| Proof of `T:uniform-exceptional`, lines 2451–2492 | `smallFundamentalSolution_doubled_of_sqrt_le`, `doubledParameterLowCover_card_le`, `exceptionalSet_subset_doubledParameter_cover` in `Pell/UniformDoubledParameterRestoration.lean`; `E_le_doubledParameter_geometric`, `uniform_exceptional_E_doubled_parameter`, `uniformExceptionalEstimate_doubled_parameter`, `uniform_exceptional_doubled_parameter` in `Pell/UniformDoubledParameterEstimate.lean`. Actual Pell small-solution predicate, unique square-part decomposition, low kernels counted by `2X^(3/4)`, actual high kernels transferred to `2θ`, and weighted geometric summation; final strict count uses literal `θ²` with shared `c = 1/3200`. | Proved; only the three standard axioms above. Ordinary dyadic scales replace the manuscript's shifted real grid; the crossing block has scale at least `√X/2`, and the actual high-kernel cutoff is used before dropping the filter. All public headline proof closures use this route. |
+| `L:anisotropic-square`, lines 504–589 | `anisotropic_sharp_squareSieve_rectangle`, `anisotropic_sharp_squareSieve_intervals`, `anisotropic_sharp_squareSieve` in `formalization/Pell/AnisotropicSharpSquareSieve.lean`. Arbitrary integral homogeneous forms of odd degree; `1 ≤ S₂ ≤ S₁`; constants precede all form, degree and interval data; square count excludes zero. The final endpoint uses closed real intervals and literal `homogeneousRectangleValueHeight = 2 + sup |f|`. Zero forms are included as a strengthening. | Proved; only `propext`, `Classical.choice`, `Quot.sound`. No factorization, discriminant, coefficient or degree-dependent assumption. |
+| `C:anisotropic-square` | `anisotropic_product_squareSieve_rectangle`, `anisotropic_product_squareSieve_intervals`, `anisotropic_product_squareSieve` in `formalization/Pell/AnisotropicSharpSquareSieve.lean`. The same odd homogeneous forms and absolute constants, with product-height hypothesis and bound `K log²(2S₁S₂) S₁^(5/4) S₂^(1/4)`. The literal endpoint uses the exact value height. | Proved from the sharp rectangle lemma by enlarging a side budget while keeping the actual finite window and its value-height bound fixed. |
+| Proof of `T:uniform-exceptional`, lines 2451–2492 | `smallFundamentalSolution_doubled_of_sqrt_le`, `doubledParameterLowCover_card_le`, `exceptionalSet_subset_doubledParameter_cover` in `formalization/Pell/UniformDoubledParameterRestoration.lean`; `E_le_doubledParameter_geometric`, `uniform_exceptional_E_doubled_parameter`, `uniformExceptionalEstimate_doubled_parameter`, `uniform_exceptional_doubled_parameter` in `formalization/Pell/UniformDoubledParameterEstimate.lean`. Actual Pell small-solution predicate, unique square-part decomposition, low kernels counted by `2X^(3/4)`, actual high kernels transferred to `2θ`, and weighted geometric summation; final strict count uses literal `θ²` with shared `c = 1/3200`. | Proved; only the three standard axioms above. Ordinary dyadic scales replace the manuscript's shifted real grid; the crossing block has scale at least `√X/2`, and the actual high-kernel cutoff is used before dropping the filter. All public headline proof closures use this route. |
 
 The squarefree bound is applied to the actual count at `2θ` by monotonicity
 from the proved estimate at `2θ+1/4`. All squarefree inputs are discharged.
@@ -169,7 +169,7 @@ The reciprocal-square-root finite sum used in the low-kernel bound is proved
 locally without importing the class-average route.
 
 Independent statement review and file hashes are in
-[`MANUSCRIPT_EXTENSIONS_REVIEW.md`](evidence/verification/MANUSCRIPT_EXTENSIONS_REVIEW.md).
+[`MANUSCRIPT_EXTENSIONS_REVIEW.md`](../checks/records/MANUSCRIPT_EXTENSIONS_REVIEW.md).
 The original extension review recorded a traversal of 3,862 project constants
 with no use of the earlier arbitrary-radicand endpoints. That count and the
 original extension-check receipts describe their historical snapshot. The
