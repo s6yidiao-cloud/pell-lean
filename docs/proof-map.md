@@ -134,7 +134,7 @@ are recorded in [verification](verification.md), `checks/records/`, and the
 [machine-readable status](../checks/formalization.yaml).
 
 The source graph contains 857 local Lean modules and is acyclic.
-The [recorded GitHub Actions build](https://github.com/s6yidiao-cloud/pell-lean/actions/runs/39291683619)
+The [recorded GitHub Actions build](https://github.com/s6yidiao-cloud/pell-lean-archive/actions/runs/39291683619)
 passed for commit `52ace63b6294009c1a7633d7466302a1efc3e4be`: all 857 modules,
 nine literal types, 27 axiom reports and seventeen mandatory endpoints.
 The [receipt](../checks/records/manuscript-primary-ci/summary.json) records the

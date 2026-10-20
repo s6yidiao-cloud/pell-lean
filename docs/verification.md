@@ -2,8 +2,8 @@
 
 ## Current verification
 
-Both [pell-lean run #14](https://github.com/s6yidiao-cloud/pell-lean/actions/runs/39362153247)
-and [pell-lean-release run #3](https://github.com/s6yidiao-cloud/pell-lean-release/actions/runs/39362161020)
+Both [original-repository run #14](https://github.com/s6yidiao-cloud/pell-lean-archive/actions/runs/39362153247)
+and [canonical-repository run #3](https://github.com/s6yidiao-cloud/pell-lean/actions/runs/39362161020)
 passed for source commit `ea6bac672a9b9c6b937eacc98fe54ab576a04f90`.
 Each rebuilt all 857 local Lean modules: 773 Pell modules, 82 vendored TauCeti
 modules, the library entry point, and the audit. All nine literal type checks,
@@ -19,6 +19,18 @@ Both runs checked the same input snapshot, SHA-256
 The workflows took 53m 46s and 49m 21s respectively. These records and status
 updates were added afterward; all Lean sources, checker scripts, dependency
 configuration, and the CI workflow still match the checked inputs.
+
+## Repository location
+
+The canonical repository is [`pell-lean`](https://github.com/s6yidiao-cloud/pell-lean),
+formerly named `pell-lean-release`. The original repository remains private as
+`pell-lean-archive`. Verification records retain their original bytes and names.
+For URLs captured in those older records, use this mapping:
+
+| Recorded location | Current location |
+| --- | --- |
+| `pell-lean/actions/...` in original-repository receipts | `pell-lean-archive/actions/...` |
+| `pell-lean-release/...` | `pell-lean/...` |
 
 ## Reproduction
 
