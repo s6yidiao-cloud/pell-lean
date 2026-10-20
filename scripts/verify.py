@@ -24,6 +24,14 @@ import time
 ROOT = Path(__file__).resolve().parents[1]
 TOOLCHAIN = "leanprover/lean4:v4.33.1"
 MATHLIB_REV = "0df444a360eaa60ab8c11dca51a86af692955474"
+# Dependency changes require a deliberate pin update, independently of release hashes.
+PINNED_DEPENDENCY_FILES = {
+    "lakefile.toml": "101b2c435a655aca7f6556c3a2c955a67f1a21943cf05c86a9a0cf9ab2707d47",
+    "lake-manifest.json": "1c77eaa5b996b6f3b45800da678052ff17b98d5fb0edf81c817de54f617c36d7",
+    "vendor/TauCeti/lakefile.toml": "a6cd9909a52532a5a275e9bd73bf10fc510123ef76abdadc0a2c0eb29182aa7e",
+    "vendor/TauCeti/lean-toolchain": "3aac669c7a910ec2389f4e4f921b605adf6ebf2d1e0c9b9cd0be4d33f3f5db71",
+    "vendor/TauCeti/lake-manifest.json": "1db9fc44525f567cdbde92bf4258e937e19bb385d590be256930c44a8cbcfc9d",
+}
 ALLOWED_AXIOMS = {"propext", "Classical.choice", "Quot.sound"}
 REQUIRED_ENDPOINTS = {
     "PellPaper.proper_form_classes_finite",
@@ -53,6 +61,37 @@ def require(condition: bool, message: str) -> None:
 
 def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def package_root() -> Path:
+    return ROOT / "formalization"
+
+
+def source_files() -> set[Path]:
+    """Discover distributable inputs independently of any frozen manifest."""
+    excluded = {".git", ".lake", "build", "__pycache__", ".pytest_cache"}
+    special = {"LICENSE", "NOTICE", "lean-toolchain", "SOURCE_SHA256SUMS",
+               ".gitignore", ".gitattributes"}
+    extensions = {".lean", ".md", ".toml", ".json", ".yaml", ".yml",
+                  ".py", ".sh", ".svg", ".png", ".cff"}
+    files = set()
+    for directory, folders, filenames in os.walk(ROOT):
+        folders[:] = [name for name in folders if name not in excluded
+                      and not name.startswith("._")]
+        for name in filenames:
+            path = Path(directory) / name
+            if not name.startswith("._") and (name in special or
+                    name.endswith(("LICENSE", "NOTICE", "COPYING")) or
+                    path.suffix in extensions or path == ROOT / "paper/main.pdf"):
+                require(not path.is_symlink(), f"Source is a symlink: {path}")
+                files.add(path)
+    return files
+
+
+def assert_unchanged(before: dict[str, str], after: dict[str, str]) -> None:
+    changed = sorted(name for name in before.keys() | after.keys()
+                     if before.get(name) != after.get(name))
+    require(not changed, f"Verification inputs changed during the run: {changed[:10]}")
 
 
 def lean_code(text: str) -> str:
@@ -108,16 +147,17 @@ def lean_code(text: str) -> str:
 
 def authored_modules() -> dict[str, tuple[Path, Path]]:
     modules = {}
-    for base, folder in [(ROOT, ROOT / "Pell"),
-                         (ROOT / "vendor/TauCeti", ROOT / "vendor/TauCeti/TauCeti")]:
+    package = package_root()
+    for base, folder in [(package, package / "Pell"),
+                         (package / "vendor/TauCeti", package / "vendor/TauCeti/TauCeti")]:
         for path in sorted(folder.rglob("*.lean")):
             if path.name.startswith("._"):
                 continue
             module = ".".join(path.relative_to(base).with_suffix("").parts)
             require(module not in modules, f"Duplicate authored module: {module}")
             modules[module] = (path, base)
-    for name in ["Pell", "PellAudit"]:
-        modules[name] = (ROOT / f"{name}.lean", ROOT)
+    modules["Pell"] = (package / "Pell.lean", package)
+    modules["PellAudit"] = (ROOT / "checks/PellAudit.lean", ROOT / "checks")
     return modules
 
 
@@ -245,31 +285,36 @@ def check_manuscript_metadata(status: str) -> None:
             "Missing or malformed private manuscript fingerprint")
 
 
-def check_integrity(modules: dict[str, tuple[Path, Path]]) -> dict[str, str]:
-    require((ROOT / "lean-toolchain").read_text().strip() == TOOLCHAIN,
+def check_integrity(modules: dict[str, tuple[Path, Path]], *, frozen: bool = False) -> dict[str, str]:
+    package = package_root()
+    require((package / "lean-toolchain").read_text().strip() == TOOLCHAIN,
             "Unexpected Lean toolchain pin")
-    manifest = json.loads((ROOT / "lake-manifest.json").read_text())
-    mathlib = [p for p in manifest["packages"] if p["name"] == "mathlib"]
-    require(len(mathlib) == 1 and mathlib[0]["rev"] == MATHLIB_REV,
-            "Unexpected Mathlib revision in Lake manifest")
-    source_files = {path for path, _ in modules.values()}
-    required = source_files | required_control_files() | {ROOT / p for p in ["lean-toolchain", "lakefile.toml",
-        "lake-manifest.json", "formalization.yaml"]}
-    status = (ROOT / "formalization.yaml").read_text()
+    for name, expected in PINNED_DEPENDENCY_FILES.items():
+        require(digest(package / name) == expected,
+                f"Dependency configuration changed: formalization/{name}; update pins deliberately")
+    authored = {path for path, _ in modules.values()}
+    required = authored | required_control_files() | {package / "lean-toolchain",
+        ROOT / "checks/formalization.yaml"} | {package / p for p in PINNED_DEPENDENCY_FILES}
+    status = (ROOT / "checks/formalization.yaml").read_text()
     check_manuscript_metadata(status)
-    hashes = check_hash_manifest(ROOT / "SOURCE_SHA256SUMS", ROOT, required)
-    require(not any(Path(name).suffix.lower() == ".tex" for name in hashes),
-            "Source manifest must not distribute private TeX manuscript files")
-    vendor = ROOT / "vendor/TauCeti"
-    check_hash_manifest(vendor / "SOURCE_SHA256SUMS", vendor,
-                        {p for p in source_files if p.is_relative_to(vendor)})
-    return hashes
+    files = source_files()
+    require(required.issubset(files), "Missing required verification input")
+    if frozen:
+        hashes = check_hash_manifest(ROOT / "checks/SOURCE_SHA256SUMS", ROOT,
+                                     files - {ROOT / "checks/SOURCE_SHA256SUMS"})
+        require(not any(Path(name).suffix.lower() == ".tex" for name in hashes),
+                "Source manifest must not distribute private TeX manuscript files")
+        vendor = package / "vendor/TauCeti"
+        check_hash_manifest(vendor / "SOURCE_SHA256SUMS", vendor,
+                            {p for p in files if p.is_relative_to(vendor)
+                             and p != vendor / "SOURCE_SHA256SUMS"})
+    return {str(path.relative_to(ROOT)): digest(path) for path in sorted(files)}
 
 
-def run(command: list[str], log: Path, *, cwd: Path = ROOT,
+def run(command: list[str], log: Path, *, cwd: Path | None = None,
         env: dict[str, str] | None = None) -> str:
     with log.open("w") as stream:
-        result = subprocess.run(command, cwd=cwd, env=env, stdout=stream,
+        result = subprocess.run(command, cwd=cwd or package_root(), env=env, stdout=stream,
                                 stderr=subprocess.STDOUT, text=True)
     output = log.read_text(errors="replace")
     require(result.returncode == 0, f"Command failed ({result.returncode}); see {log}\n{output[-6000:]}")
@@ -293,7 +338,7 @@ def check_lean_version(version: str) -> None:
 
 
 def dependency_path(directory: Path, git: str, *, receipts: list[dict] | None = None) -> list[Path]:
-    manifest = json.loads((ROOT / "lake-manifest.json").read_text())
+    manifest = json.loads((package_root() / "lake-manifest.json").read_text())
     paths = []
     for package in manifest["packages"]:
         if package["type"] != "git":
@@ -324,7 +369,7 @@ def dependency_path(directory: Path, git: str, *, receipts: list[dict] | None = 
 
 
 def check_audit(output: str) -> dict[str, list[str]]:
-    code = lean_code((ROOT / "PellAudit.lean").read_text())
+    code = lean_code((ROOT / "checks/PellAudit.lean").read_text())
     expected = re.findall(r"(?m)^\s*#print\s+axioms\s+([\w.]+)\s*$", code)
     require(len(expected) == len(set(expected)), "Duplicate #print axioms endpoint")
     require(REQUIRED_ENDPOINTS.issubset(expected), "PellAudit omits a mandatory endpoint")
@@ -346,7 +391,7 @@ def check_audit(output: str) -> dict[str, list[str]]:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--mode", choices=["lake", "direct"], default="lake")
-    parser.add_argument("--dependencies", type=Path, default=ROOT / ".lake/packages",
+    parser.add_argument("--dependencies", type=Path, default=package_root() / ".lake/packages",
                         help="Pinned external Lake packages directory (direct mode)")
     parser.add_argument("--git", help="Working Git executable, e.g. a portable Git on macOS")
     parser.add_argument("--lean", default="lean", help="Lean executable (direct mode)")
@@ -355,6 +400,8 @@ def main() -> None:
     parser.add_argument("--lean-threads", type=int, default=int(os.environ.get("LEAN_NUM_THREADS", "2")),
                         help="Threads per direct Lean process (default: LEAN_NUM_THREADS or 2)")
     parser.add_argument("--logs", type=Path, help="New log directory; defaults to build/verification/<timestamp>")
+    parser.add_argument("--frozen", action="store_true",
+                        help="Also require the checked-in release manifests to match")
     args = parser.parse_args()
     require(args.jobs > 0 and args.lean_threads > 0, "Compiler job/thread counts must be positive")
     started = time.monotonic()
@@ -362,26 +409,28 @@ def main() -> None:
     logs.mkdir(parents=True, exist_ok=False)
     modules = authored_modules()
     order = scan_and_order(modules)
-    hashes = check_integrity(modules)
+    hashes = check_integrity(modules, frozen=args.frozen)
     (logs / "source-hashes.json").write_text(json.dumps(hashes, indent=2) + "\n")
+    snapshot = logs / "SOURCE_SHA256SUMS"
+    snapshot.write_text("".join(f"{value}  {name}\n" for name, value in sorted(hashes.items())))
     git = choose_git(args.git)
     dependency_receipts = []
     if args.mode == "lake":
         version = run(["lake", "env", "lean", "--version"], logs / "lean-version.log")
         check_lean_version(version)
         # Delete only generated authored artifacts. Preserve external Mathlib caches.
-        for location in [ROOT / ".lake/build", ROOT / "vendor/TauCeti/.lake/build"]:
+        for location in [package_root() / ".lake/build", package_root() / "vendor/TauCeti/.lake/build"]:
             if location.exists():
                 shutil.rmtree(location)
         run(["lake", "exe", "cache", "get"], logs / "cache.log")
-        dependency_path(ROOT / ".lake/packages", git, receipts=dependency_receipts)
+        dependency_path(package_root() / ".lake/packages", git, receipts=dependency_receipts)
         run(["lake", "--wfail", "--no-cache", "--rehash", "build", "Pell"], logs / "lake-build.log")
         targets = [("@TauCeti/+" if name.startswith("TauCeti.") else "+") + name + ":olean"
                    for name in order if name != "PellAudit"]
         run(["lake", "--wfail", "--no-cache", "--rehash", "build", *targets],
             logs / "lake-all-modules.log")
         audit_output = run(["lake", "env", "lean", "-DwarningAsError=true", "-T0",
-                            "PellAudit.lean"], logs / "audit.log")
+                            str(ROOT / "checks/PellAudit.lean")], logs / "audit.log")
     else:
         version = run([args.lean, "--version"], logs / "lean-version.log")
         check_lean_version(version)
@@ -400,6 +449,8 @@ def main() -> None:
                 target.parent.mkdir(parents=True, exist_ok=True)
                 module_start = time.monotonic()
                 source_hash = digest(source)
+                require(source_hash == hashes[str(source.relative_to(ROOT))],
+                        f"Source changed before compiling {name}")
                 print(f"[{indexes[name]}/{len(order)}] {name}", flush=True)
                 output = run([args.lean, "-DwarningAsError=true", "-T0", "-R", str(package_root),
                               "-j", str(args.lean_threads), "-o", str(target), str(source)],
@@ -421,17 +472,19 @@ def main() -> None:
     final_modules = authored_modules()
     require(set(final_modules) == set(modules), "Authored module set changed during verification")
     scan_and_order(final_modules)
-    final_hashes = check_integrity(final_modules)
+    final_hashes = check_integrity(final_modules, frozen=args.frozen)
     if args.mode == "direct":
         for entry in receipt:
             require(digest(modules[entry["module"]][0]) == entry["source_sha256"],
                     f"Compiled source changed afterward: {entry['module']}")
-    require(final_hashes == hashes, "Source/manifest changed during verification")
+    assert_unchanged(hashes, final_hashes)
     summary = {"status": "passed", "mode": args.mode, "toolchain": TOOLCHAIN,
                "compiler_version": version.strip(),
                "mathlib_commit": MATHLIB_REV, "dependencies": dependency_receipts,
                "authored_modules": len(modules),
-               "source_manifest_sha256": digest(ROOT / "SOURCE_SHA256SUMS"),
+               "source_policy": "frozen" if args.frozen else "current",
+               "source_snapshot_sha256": digest(snapshot),
+               "frozen_manifest_sha256": digest(ROOT / "checks/SOURCE_SHA256SUMS") if args.frozen else None,
                "direct_jobs": args.jobs if args.mode == "direct" else None,
                "direct_lean_threads": args.lean_threads if args.mode == "direct" else None,
                "axiom_audit": axioms, "seconds": round(time.monotonic() - started, 3)}

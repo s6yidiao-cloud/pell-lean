@@ -2,6 +2,8 @@
 """Regression checks for the verification trust boundary (no Lean build)."""
 
 import tempfile
+from contextlib import contextmanager
+import shutil
 import threading
 import time
 import unittest
@@ -11,7 +13,99 @@ from unittest.mock import patch
 import verify
 
 
+@contextmanager
+def checkout():
+    """Small checkout with the real dependency pins and dummy Lean sources."""
+    original = verify.ROOT
+    with tempfile.TemporaryDirectory() as temporary:
+        root = Path(temporary)
+        for name in ["lean-toolchain", *verify.PINNED_DEPENDENCY_FILES]:
+            destination = root / "formalization" / name
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(original / "formalization" / name, destination)
+        texts = {
+            "formalization/Pell.lean": "import Pell.A\n",
+            "formalization/Pell/A.lean": "theorem proof : True := .intro\n",
+            "formalization/vendor/TauCeti/TauCeti/A.lean": "theorem vendorProof : True := .intro\n",
+            "checks/PellAudit.lean": "import Pell\n",
+            "checks/formalization.yaml": "source:\n  bundled: false\n  sha256: " + "a" * 64 + "\n",
+            "README.md": "A development checkout.\n",
+            "scripts/verify.py": "# verifier\n",
+            "scripts/test_verify.py": "# tests\n",
+            "scripts/package.py": "# packager\n",
+            ".github/workflows/lean.yml": "# workflow\n",
+        }
+        for name, text in texts.items():
+            path = root / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(text)
+        with patch.object(verify, "ROOT", root):
+            yield root
+
+
+def freeze_checkout(root):
+    vendor = root / "formalization/vendor/TauCeti"
+    for base, manifest in [(vendor, vendor / "SOURCE_SHA256SUMS"),
+                           (root, root / "checks/SOURCE_SHA256SUMS")]:
+        manifest.write_text("".join(f"{verify.digest(path)}  {path.relative_to(base)}\n"
+            for path in sorted(verify.source_files())
+            if path.is_relative_to(base) and path != manifest))
+
+
 class VerificationBoundaryTests(unittest.TestCase):
+    def test_current_sources_allow_edits_without_updating_release_manifests(self):
+        with checkout() as root:
+            freeze_checkout(root)
+            verify.check_integrity(verify.authored_modules(), frozen=True)
+            for name, text in [
+                ("README.md", "Revised documentation.\n"),
+                ("formalization/Pell/A.lean", "-- Revised comment\ntheorem proof : True := .intro\n"),
+                ("formalization/Pell/A.lean", "theorem revised : True := .intro\n"),
+                ("formalization/Pell/New.lean", "theorem added : True := .intro\n"),
+                ("formalization/vendor/TauCeti/TauCeti/A.lean", "theorem revisedVendor : True := .intro\n"),
+            ]:
+                with self.subTest(name=name, text=text):
+                    (root / name).write_text(text)
+                    modules = verify.authored_modules()
+                    verify.scan_and_order(modules)
+                    snapshot = verify.check_integrity(modules)
+                    self.assertEqual(snapshot[name], verify.digest(root / name))
+                    with self.assertRaisesRegex(RuntimeError, "Hash mismatch|omits required"):
+                        verify.check_integrity(modules, frozen=True)
+
+    def test_current_snapshot_detects_edits_additions_and_deletions_during_build(self):
+        for operation in ["edit", "add", "delete"]:
+            with self.subTest(operation=operation), checkout() as root:
+                before = verify.check_integrity(verify.authored_modules())
+                if operation == "edit":
+                    (root / "README.md").write_text("Edited while compiling.\n")
+                elif operation == "add":
+                    (root / "formalization/Pell/New.lean").write_text("theorem added : True := .intro\n")
+                else:
+                    (root / "README.md").unlink()
+                after = verify.check_integrity(verify.authored_modules())
+                with self.assertRaisesRegex(RuntimeError, "inputs changed"):
+                    verify.assert_unchanged(before, after)
+
+    def test_current_mode_still_rejects_proof_escapes(self):
+        with checkout() as root:
+            for token in ["sorry", "admit", "axiom", "native_decide", "trustCompiler", "sorryAx"]:
+                with self.subTest(token=token):
+                    (root / "formalization/Pell/A.lean").write_text(f"by {token}\n")
+                    with self.assertRaisesRegex(RuntimeError, "Forbidden proof token"):
+                        verify.scan_and_order(verify.authored_modules())
+
+    def test_dependency_configs_remain_pinned_without_frozen_mode(self):
+        with checkout() as root:
+            for name in verify.PINNED_DEPENDENCY_FILES:
+                path = root / "formalization" / name
+                original = path.read_bytes()
+                path.write_bytes(original + b"\n")
+                with self.subTest(name=name):
+                    with self.assertRaisesRegex(RuntimeError, "Dependency configuration changed"):
+                        verify.check_integrity(verify.authored_modules())
+                path.write_bytes(original)
+
     def test_private_manuscript_provenance_needs_no_tex_file(self):
         status = 'source:\n  bundled: false\n  sha256: ' + 'a' * 64 + '\n'
         verify.check_manuscript_metadata(status)
