@@ -117,8 +117,8 @@ checker:
   latest_recorded_full_fresh_build: passed
   latest_recorded_full_build_receipt: checks/records/layout-ci/summary.json
   latest_recorded_full_build_source_commit: ea6bac672a9b9c6b937eacc98fe54ab576a04f90
-  latest_recorded_full_build_ci_run: https://github.com/s6yidiao-cloud/pell-lean/actions/runs/39362153247
-  release_full_build_ci_run: https://github.com/s6yidiao-cloud/pell-lean-release/actions/runs/39362161020
+  latest_recorded_full_build_ci_run: https://github.com/s6yidiao-cloud/pell-lean-archive/actions/runs/39362153247
+  canonical_full_build_ci_run: https://github.com/s6yidiao-cloud/pell-lean/actions/runs/39362161020
   latest_recorded_full_build_elapsed_seconds: 3066.743
   latest_recorded_full_build_input_manifest_sha256: d4ce46eb30bc7da9e956fa3460cf55c5fb08712d631bdf180d26ac08268a3737
   current_snapshot_boundary: verification records and status updates only; all Lean and checker sources match the recorded CI build
