@@ -113,14 +113,15 @@ checker:
   required_endpoints: 17
   focused_compilation: passed with warnings as errors for all 67 affected modules and importing roots
   source_import_graph: acyclic
-  current_full_fresh_build: not_run_after_layout_and_verifier_changes
+  current_full_fresh_build: passed
   latest_recorded_full_fresh_build: passed
-  latest_recorded_full_build_receipt: checks/records/manuscript-primary-ci/summary.json
-  latest_recorded_full_build_source_commit: 52ace63b6294009c1a7633d7466302a1efc3e4be
-  latest_recorded_full_build_ci_run: https://github.com/s6yidiao-cloud/pell-lean/actions/runs/39291683619
-  latest_recorded_full_build_elapsed_seconds: 2233.681
-  latest_recorded_full_build_input_manifest_sha256: af22bfef63093774593ec7f16291452f6088bc641d22e79d7fbc2099fc94f467
-  current_snapshot_boundary: repository layout, verifier, packaging, and documentation updated; all Lean source contents match the recorded CI build
+  latest_recorded_full_build_receipt: checks/records/layout-ci/summary.json
+  latest_recorded_full_build_source_commit: ea6bac672a9b9c6b937eacc98fe54ab576a04f90
+  latest_recorded_full_build_ci_run: https://github.com/s6yidiao-cloud/pell-lean/actions/runs/39362153247
+  release_full_build_ci_run: https://github.com/s6yidiao-cloud/pell-lean-release/actions/runs/39362161020
+  latest_recorded_full_build_elapsed_seconds: 3066.743
+  latest_recorded_full_build_input_manifest_sha256: d4ce46eb30bc7da9e956fa3460cf55c5fb08712d631bdf180d26ac08268a3737
+  current_snapshot_boundary: verification records and status updates only; all Lean and checker sources match the recorded CI build
   proof_source_contents_match_recorded_build: true
   historical_receipts: retained for their recorded source snapshots
   independent_kernel_replay: not performed
