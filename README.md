@@ -5,11 +5,10 @@ Lean proofs of the main results in
 
 | Manuscript result | Declaration in [`MainResults.lean`](formalization/Pell/MainResults.lean) |
 | --- | --- |
-| Theorem 1.1 — Class-number averages | `PellPaper.field_class_average` |
-| Theorem 1.2 — Average number of odd-order ideal classes | `PellPaper.odd_class_average` |
-| Theorem 1.3 — Uniform exceptional-set bound for small Pell solutions | `PellPaper.uniform_exceptional` |
-| Corollary 1.4 — Logarithmic growth of the fundamental Pell solution | `PellPaper.pell_unit_growth_density` |
-| Corollary 1.4 — Growth beyond every fixed power | `PellPaper.fixed_power_density` |
+| Theorem 1.1 | `PellPaper.field_class_average` |
+| Theorem 1.2 | `PellPaper.odd_class_average` |
+| Theorem 1.3 | `PellPaper.uniform_exceptional` |
+| Corollary 1.4| `PellPaper.pell_unit_growth_density`, `PellPaper.fixed_power_density` |
 
 ## Build and verify
 
